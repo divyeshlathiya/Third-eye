@@ -1,0 +1,84 @@
+# Flutter/Dart/Pub
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.flutter-plugins-symlink
+.doc/
+*.lock
+
+# Environment files
+.env
+.env.*
+
+# Coverage
+coverage/
+
+# IDEs and editor files
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.swp
+
+# Miscellaneous
+.DS_Store
+*.log
+
+# Android
+android/.gradle/
+android/key.properties
+android/app/google-services.json
+android/local.properties
+android/**/*.iml
+android/.idea/
+android/.settings/
+android/captures/
+android/build/
+
+# iOS and Xcode
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Pods/
+ios/.symlinks/
+ios/Pods/
+ios/Flutter/ephemeral/
+ios/.generated/
+ios/DerivedData/
+ios/*.xcworkspace
+ios/xcuserdata/
+ios/**/*.mode1v3
+ios/**/*.mode2v3
+ios/**/*.pbxuser
+ios/**/*.perspectivev3
+ios/**/*sync/
+ios/**/*.moved-aside
+ios/**/.sconsign.dblite
+ios/**/.tags*
+ios/**/.vagrant/
+ios/ServiceDefinitions.json
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.moved-aside
+*sync/
+Icon?
+.tags*
+
+# Exceptions for certain default files
+!ios/**/default.pbxuser
+!ios/**/default.mode1v3
+!ios/**/default.mode2v3
+!ios/**/default.perspectivev3
+

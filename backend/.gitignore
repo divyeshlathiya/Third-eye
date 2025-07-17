@@ -1,0 +1,65 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment variables
+.env
+.env.*
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE/editor specific
+.vscode/
+.idea/
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test output
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+.cache
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Pytest
+.pytest_cache/
+
+# Log files
+*.log
+
+# Dist and build folders
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# SQLite database
+*.sqlite3
+
+# Other
+*.pot
+*.mo
+*.pyd
