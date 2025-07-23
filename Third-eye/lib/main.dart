@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thirdeye/login_screen.dart';
+import 'package:thirdeye/screen/about_yourself.dart';
 
 void main() {
   runApp(
@@ -114,10 +115,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             TextButton(
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
+                      // builder: (context) => const LoginScreen(),
+                      builder: (context) => const AboutYourSelfScreen(),
                     ));
               },
               child: const Text("Skip"),

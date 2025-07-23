@@ -8,6 +8,10 @@ from auth.auth import create_access_token, decode_access_token, hash_password, v
 from database.database import SessionLocal, engine
 from models.user import User
 from schemas.user import CreateUser, ShowUser, LoginUser
+from schemas.otp import OtpRequest, OtpVerifyRequest
+from utils.email_utils import send_otp_email
+from utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails
+
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -28,9 +32,28 @@ def get_db():
 def health():
     return {"status": "Ok"}
 
+
 @router.get("/users")
 def get_all_users(db: Session = Depends(get_db)):
     return db.query(User).all()
+
+
+@router.post("/send-otp")
+async def send_otp(data: OtpRequest, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == data.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    otp = generate_otp()
+    save_otp(data.email, otp)
+    await send_otp_email(data.email, otp)
+
+
+@router.post("/verify-otp")
+def verify_email_otp(data: OtpVerifyRequest):
+    if verify_otp(data.email, data.otp):
+        verified_emails.add(data.email)
+        return {"message": "email verified successfully."}
+    raise HTTPException(status_code=400, detail="Invalid or expired otp")
 
 
 @router.get("/me",)
@@ -68,6 +91,7 @@ def register(user: CreateUser, db: Session = Depends(get_db)):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+        verified_emails.remove(user.email)
         return new_user
 
     except Exception as e:

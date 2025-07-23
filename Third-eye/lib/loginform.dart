@@ -57,13 +57,15 @@ class _LoginformState extends State<Loginform> {
           leading: IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              FocusScope.of(context).unfocus(); // Close keyboard
+              await Future.delayed(const Duration(milliseconds: 200));
+              if (context.mounted) Navigator.pop(context); // Then pop
             },
             icon: const Icon(Icons.arrow_back, color: Colors.black),
           ),
         ),
-        // resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(

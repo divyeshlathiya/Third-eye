@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:thirdeye/auth/sign_up.dart';
 import 'package:thirdeye/models/User.dart';
+import 'package:thirdeye/screen/otp_verfication_screen.dart';
+import 'package:thirdeye/screen/verified_screen.dart';
+import 'package:thirdeye/sharable_widget/back_btn.dart';
 
 class Signupform extends StatefulWidget {
   const Signupform({super.key});
@@ -17,6 +20,7 @@ class _SignupformState extends State<Signupform> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // ignore: unused_element
   void _signUp() async {
     String firstName = _firstNameController.text;
     String lastName = _lastNameController.text;
@@ -34,13 +38,18 @@ class _SignupformState extends State<Signupform> {
       bool isSignUp = await signUpUser(user);
       if (isSignUp) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text('Account created successfully'),
-            backgroundColor: Colors.deepPurple,
-          ),
-        );
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OtpVerificationScreen(),
+            ));
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     behavior: SnackBarBehavior.floating,
+        //     content: Text('Account created successfully'),
+        //     backgroundColor: Colors.deepPurple,
+        //   ),
+        // );
         _firstNameController.clear();
         _lastNameController.clear();
         _emailController.clear();
@@ -49,7 +58,7 @@ class _SignupformState extends State<Signupform> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill in both fields'),
+          content: Text('Please fill all fields'),
           backgroundColor: Colors.deepPurple,
         ),
       );
@@ -68,14 +77,8 @@ class _SignupformState extends State<Signupform> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-        ),
-      ),
+      appBar: AppBar(leading: MyBackButton()),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -170,7 +173,14 @@ class _SignupformState extends State<Signupform> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _signUp,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OtpVerificationScreen(),
+                          // builder: (context) => VerifiedScreen(),
+                        ));
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
