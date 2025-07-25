@@ -115,7 +115,6 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
           "Tell us about yourself",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        centerTitle: false,
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
@@ -149,9 +148,9 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  _genderButton("Female", "icons/female.svg"),
+                  _genderButton("Female", "assets/icons/female.svg"),
                   const SizedBox(width: 12),
-                  _genderButton("Male", "icons/male.svg"),
+                  _genderButton("Male", "assets/icons/male.svg"),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.40),
