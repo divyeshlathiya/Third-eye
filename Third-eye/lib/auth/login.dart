@@ -2,15 +2,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thirdeye/config/urls.dart';
 
 Future<bool> loginUser(String email, String password) async {
-  // final String apiUrl = "http://192.168.1.77:8000/auth/login";
-  final String apiUrl = "http://10.47.125.29:8000/auth/login";
-  // final String localHostApiUrl = "http://localhost:8000/auth/login";
+  final String apiUrl = ConfigURL.loginURL;
 
   try {
     final url = Uri.parse(apiUrl);
-    // final url = Uri.parse(localHostApiUrl);
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},

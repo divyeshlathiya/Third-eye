@@ -1,17 +1,25 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:thirdeye/auth/sign_up.dart';
+import 'package:thirdeye/models/User.dart';
+import 'package:thirdeye/screen/verified_screen.dart';
+
 import 'package:thirdeye/sharable_widget/button.dart';
+import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/sharable_widget/text_feild.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({super.key});
+  const OtpVerificationScreen(
+      {super.key, required this.email, required this.user});
+  final String email;
+  final User user;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  final String _email = "john.doe@gmail.com";
+  late final String _email = widget.email;
   final TextEditingController _otpController = TextEditingController();
 
   int _secondsRemaining = 30;
@@ -24,13 +32,37 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     _startTimer();
   }
 
+  void _verifyOtpAndAccount(String otp) async {
+    bool isValid = await SignUpUser.verifyOtp(widget.email, otp);
+    if (isValid) {
+      bool registered = await SignUpUser.signUpUser(widget.user);
+      if (registered) {
+        if (!mounted) return;
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VerifiedScreen(),
+            ));
+        CustomSnackBar.showCustomSnackBar(
+            context, "User registered successfully");
+      } else {
+        if (!mounted) return;
+        CustomSnackBar.showCustomSnackBar(
+            context, "Error in user registration");
+      }
+    } else {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Please enter valid otp.");
+    }
+  }
+
   void _startTimer() {
     setState(() {
       _secondsRemaining = 30;
       _canResend = false;
     });
 
-    _timer?.cancel(); // Cancel any existing timer
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
         setState(() {
@@ -152,7 +184,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ],
               ),
               SizedBox(height: screenHeight * 0.35),
-              MyButton(buttonLabel: "Verify account", onPressed: () {})
+              MyButton(
+                  buttonLabel: "Verify account",
+                  onPressed: () => _verifyOtpAndAccount(_otpController.text))
             ],
           ),
         ),

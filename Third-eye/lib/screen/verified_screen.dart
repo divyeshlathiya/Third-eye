@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:thirdeye/dashboard/dashboard.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
 
 class VerifiedScreen extends StatelessWidget {
@@ -30,7 +31,13 @@ class VerifiedScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 MyButton(
                   buttonLabel: "Start",
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DashboardScreen(),
+                        ));
+                  },
                 ),
               ],
             ),

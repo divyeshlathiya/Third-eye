@@ -39,6 +39,13 @@ dependencies:
   shared_preferences: ^2.5.3
   http: ^1.4.0
   intl: ^0.20.2
+  flutter_screenutil: ^5.9.0
+  image_picker: ^1.1.2
+  google_sign_in: ^6.2.1
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.19.2
+  path_provider: ^2.1.5
+  share_plus: ^10.0.0
 
 dev_dependencies:
   flutter_test:

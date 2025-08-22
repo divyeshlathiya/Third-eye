@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:thirdeye/dashboard/dashboard.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
 
@@ -154,7 +155,15 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.40),
-              MyButton(buttonLabel: "Next", onPressed: (){})
+              MyButton(
+                  buttonLabel: "Next",
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(  
+                          builder: (context) => DashboardScreen(),
+                        ));
+                  })
             ],
           ),
         ),

@@ -3,8 +3,9 @@ import 'package:flutter/gestures.dart';
 import 'package:thirdeye/auth/sign_up.dart';
 import 'package:thirdeye/models/User.dart';
 import 'package:thirdeye/screen/otp_verfication_screen.dart';
-import 'package:thirdeye/screen/verified_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
+import 'package:thirdeye/sharable_widget/pwd_txt_feild.dart';
+import 'package:thirdeye/sharable_widget/text_feild.dart';
 
 class Signupform extends StatefulWidget {
   const Signupform({super.key});
@@ -14,42 +15,42 @@ class Signupform extends StatefulWidget {
 }
 
 class _SignupformState extends State<Signupform> {
-  bool _obscurePassword = true;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // ignore: unused_element
-  void _signUp() async {
+  void _createAccount() async {
     String firstName = _firstNameController.text;
     String lastName = _lastNameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    print("\nSign up btn clicked.");
-
     if (isNotEmpty(firstName, lastName, email, password)) {
-      User user = User(
+      User newUser = User(
           firstName: firstName,
           lastName: lastName,
           email: email,
           password: password);
-      bool isSignUp = await signUpUser(user);
-      if (isSignUp) {
+      bool otpSent = await SignUpUser.sendOtpUser(email);
+      if (otpSent) {
         if (!mounted) return;
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OtpVerificationScreen(),
+              builder: (context) => OtpVerificationScreen(
+                email: email,
+                user: newUser,
+              ),
             ));
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(
-        //     behavior: SnackBarBehavior.floating,
-        //     content: Text('Account created successfully'),
-        //     backgroundColor: Colors.deepPurple,
-        //   ),
-        // );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            clipBehavior: Clip.antiAlias,
+            behavior: SnackBarBehavior.floating,
+            content: Text('Otp sent successfully'),
+            backgroundColor: Colors.deepPurple,
+          ),
+        );
         _firstNameController.clear();
         _lastNameController.clear();
         _emailController.clear();
@@ -63,6 +64,105 @@ class _SignupformState extends State<Signupform> {
         ),
       );
     }
+  }
+
+  // void _signUp() async {
+  //   String firstName = _firstNameController.text;
+  //   String lastName = _lastNameController.text;
+  //   String email = _emailController.text;
+  //   String password = _passwordController.text;
+
+  //   print("\nSign up btn clicked.");
+
+  //   if (isNotEmpty(firstName, lastName, email, password)) {
+  //     User user = User(
+  //         firstName: firstName,
+  //         lastName: lastName,
+  //         email: email,
+  //         password: password);
+  //     bool isSignUp = await signUpUser(user);
+  //     if (isSignUp) {
+  //       if (!mounted) return;
+  //       Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => OtpVerificationScreen(
+  //               email: email,
+  //             ),
+  //           ));
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           clipBehavior: Clip.antiAlias,
+  //           behavior: SnackBarBehavior.floating,
+  //           content: Text('Otp sent successfully'),
+  //           backgroundColor: Colors.deepPurple,
+  //         ),
+  //       );
+  //       _firstNameController.clear();
+  //       _lastNameController.clear();
+  //       _emailController.clear();
+  //       _passwordController.clear();
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Please fill all fields'),
+  //         backgroundColor: Colors.deepPurple,
+  //       ),
+  //     );
+  //   }
+  // }
+
+  Widget _createAccountBtn() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _createAccount,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          backgroundColor: const Color(0xFF362491), // Purpl  e shade
+        ),
+        child: const Text(
+          "Create Account",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _termsAndConditionsWidget() {
+    return Center(
+      child: Text.rich(
+          TextSpan(
+            text: 'By continuing, you agree to our ',
+            children: [
+              TextSpan(
+                text: 'Terms of Service',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+                recognizer: TapGestureRecognizer()..onTap = () {},
+              ),
+              const TextSpan(text: ' and '),
+              TextSpan(
+                text: 'Privacy Policy.',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+                recognizer: TapGestureRecognizer()..onTap = () {},
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center),
+    );
   }
 
   bool isNotEmpty(String firstName, String lastName, String email, String pwd) {
@@ -100,67 +200,25 @@ class _SignupformState extends State<Signupform> {
               Row(
                 children: [
                   Expanded(
-                      child: TextField(
+                      child: MyTextFeild(
                     controller: _firstNameController,
-                    decoration: InputDecoration(
-                      hintText: "First Name",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                    ),
+                    hintText: "John",
                   )),
                   const SizedBox(width: 10),
                   Expanded(
-                      child: TextField(
+                      child: MyTextFeild(
                     controller: _lastNameController,
-                    decoration: InputDecoration(
-                      hintText: "Last Name",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                    ),
+                    hintText: "Doe",
                   )),
                 ],
               ),
               const SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  hintText: "Enter your email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-              ),
+              MyTextFeild(
+                  controller: _emailController, hintText: "Enter your email"),
               const SizedBox(height: 20),
-              TextField(
+              CustomPasswordTextFeild(
                 controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                    hintText: "********",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                    )),
+                hintText: "***********",
               ),
               const SizedBox(height: 6),
               Align(
@@ -170,67 +228,9 @@ class _SignupformState extends State<Signupform> {
                     child: const Text("must contain 8 characters")),
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OtpVerificationScreen(),
-                          // builder: (context) => VerifiedScreen(),
-                        ));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    backgroundColor: const Color(0xFF362491), // Purpl  e shade
-                  ),
-                  child: const Text(
-                    "Create Account",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+              _createAccountBtn(),
               const SizedBox(height: 16),
-              Center(
-                child: Text.rich(
-                    TextSpan(
-                      text: 'By continuing, you agree to our ',
-                      children: [
-                        TextSpan(
-                          text: 'Terms of Service',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueAccent,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              // TODO: Navigate to Terms
-                            },
-                        ),
-                        const TextSpan(text: ' and '),
-                        TextSpan(
-                          text: 'Privacy Policy.',
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              // TODO: Navigate to Privacy
-                            },
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center),
-              )
+              _termsAndConditionsWidget()
             ],
           ),
         ),

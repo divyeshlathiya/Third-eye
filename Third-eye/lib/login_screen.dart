@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:thirdeye/auth/google_login.dart';
+import 'package:thirdeye/dashboard/dashboard.dart';
 import 'package:thirdeye/loginform.dart';
 import 'package:thirdeye/signupform.dart';
 
@@ -11,13 +13,33 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+
+  void _googleLogin() async {
+    final user = await SignInWithGoogle.signInWithGoogle();
+    if (!mounted) return;
+    if (user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Welcome ${user.displayName}")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Google Sign-In failed")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // ✅ Background wave
           Positioned(
             top: 70,
             left: 0,
@@ -105,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: _googleLogin,
                     icon: Image.asset(
                       "assets/google_icon.png",
                       height: 20,
