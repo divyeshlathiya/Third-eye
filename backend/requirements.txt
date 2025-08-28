@@ -8,3 +8,4 @@ sqlalchemy
 fastapi-mail
 gunicorn
 python-multipart
+firebase-admin
