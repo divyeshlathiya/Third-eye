@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from .service.auth_service import router as auth_router
 from .service.google_auth_service import router as google_auth_router
-from middleware.cors import add_cors_middleware
+from .middleware.cors import add_cors_middleware
 import uvicorn
 
 app = FastAPI()
