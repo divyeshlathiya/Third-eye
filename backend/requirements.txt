@@ -6,4 +6,8 @@ passlib[bcrypt]
 python-dotenv
 sqlalchemy
 fastapi-mail
+<<<<<<< HEAD
 gunicorn
+=======
+gunicorn
+>>>>>>> acfc8f1102f68d84135442b83b4870e90ae22f77

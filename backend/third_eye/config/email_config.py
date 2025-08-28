@@ -3,8 +3,11 @@ from pydantic import BaseModel, EmailStr
 from pydantic_settings import BaseSettings
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class MailSettings(BaseSettings):
@@ -37,5 +40,5 @@ conf = ConnectionConfig(
     MAIL_SSL_TLS=mail_settings.MAIL_SSL_TLS,
     USE_CREDENTIALS=mail_settings.USE_CREDENTIALS,
     VALIDATE_CERTS=mail_settings.VALIDATE_CERTS,
-    TEMPLATE_FOLDER="templates"
+    TEMPLATE_FOLDER=BASE_DIR / "templates",
 )
