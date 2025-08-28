@@ -1,16 +1,16 @@
-from fastapi import HTTPException, Depends, APIRouter
+from fastapi import HTTPException, Depends, APIRouter, Body
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from auth.auth import create_access_token, decode_access_token, hash_password, verfiy_password, ALGORITHM, SECRET_KEY
-from database.database import SessionLocal, engine
-from models.user import User
-from schemas.user import CreateUser, ShowUser, LoginUser
-from schemas.otp import OtpRequest, OtpVerifyRequest
-from utils.email_utils import send_otp_email
-from utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails
+from ..auth.auth import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS, create_access_token, create_refresh_token, decode_access_token, hash_password, verfiy_password, ALGORITHM, SECRET_KEY
+from ..database.database import SessionLocal, engine
+from ..models.user import User
+from ..schemas.user import CreateUser, ShowUser, LoginUser
+from ..schemas.otp import OtpRequest, OtpVerifyRequest
+from ..utils.email_utils import send_otp_email
+from ..utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -52,7 +52,7 @@ async def send_otp(data: OtpRequest, db: Session = Depends(get_db)):
 def verify_email_otp(data: OtpVerifyRequest):
     if verify_otp(data.email, data.otp):
         verified_emails.add(data.email)
-        return {"message": "email verified successfully."}
+        return {"message": "Email verified successfully"}
     raise HTTPException(status_code=400, detail="Invalid or expired otp")
 
 
@@ -109,6 +109,56 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     access_token = create_access_token(
-        data={"sub": user.email}, expire_delta=timedelta(minutes=30))
+        data={"sub": user.email}, expire_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
 
-    return {"access_token": access_token, "token_type": "Bearer"}
+    refresh_token = create_refresh_token(
+        data={"sub": user.email}, expire_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "Bearer"
+    }
+
+
+@router.post("/refreshToken")
+def refresh_token(refresh_token: str = Body(...), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(
+                status_code=401, detail="Invalid refresh token")
+
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # issue new access token
+        new_access_token = create_access_token(
+            data={"sub": user.email}, expire_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        )
+
+        return {
+            "access_token": new_access_token,
+            "token_type": "Bearer"
+        }
+
+    except JWTError:
+        raise HTTPException(
+            status_code=401, detail="Refresh token invalid or expired")
+
+
+# @router.post("/login")
+# def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+#     user = db.query(User).filter(User.email == form_data.username).first()
+
+#     if not user or not verfiy_password(form_data.password, user.password):
+#         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+#     access_token = create_access_token(
+#         data={"sub": user.email}, expire_delta=timedelta(minutes=30))
+
+#     return {"access_token": access_token, "token_type": "Bearer"}

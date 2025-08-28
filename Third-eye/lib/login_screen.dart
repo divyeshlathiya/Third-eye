@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:thirdeye/auth/google_login.dart';
-import 'package:thirdeye/dashboard/dashboard.dart';
+import 'package:thirdeye/repositories/google_auth_repository.dart';
+import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/loginform.dart';
+import 'package:thirdeye/services/google_auth_service.dart';
+import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/signupform.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,24 +15,61 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // void _googleLogin() async {
+  //   final user = await SignInWithGoogle.signInWithGoogle();
+  //   if (!mounted) return;
+  //   if (user != null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Welcome ${user.displayName}")),
+  //     );
 
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => DashboardScreen()),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("Google Sign-In failed")),
+  //     );
+  //   }
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAutoLogin();
+  }
+
+  void _checkAutoLogin() async {
+    final repo = GoogleAuthRepository(GoogleAuthService());
+
+    bool isLoggedIn = await repo.tryAutoLogin();
+    if (isLoggedIn) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardScreen()),
+      );
+    }
+  }
 
   void _googleLogin() async {
-    final user = await SignInWithGoogle.signInWithGoogle();
+    final repo = GoogleAuthRepository(GoogleAuthService());
+
+    final userData = await repo.signInWithGoogle();
     if (!mounted) return;
-    if (user != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Welcome ${user.displayName}")),
-      );
+
+    if (userData != null) {
+      CustomSnackBar.showCustomSnackBar(context, "Welcome ${userData['name']}",
+          backgroundColor: Colors.purple);
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DashboardScreen()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Google Sign-In failed")),
-      );
+      CustomSnackBar.showCustomSnackBar(context, "Google Sign-In failed",
+          backgroundColor: Colors.red);
     }
   }
 

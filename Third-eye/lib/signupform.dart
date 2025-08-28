@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:thirdeye/auth/sign_up.dart';
 import 'package:thirdeye/models/User.dart';
+import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/otp_verfication_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/pwd_txt_feild.dart';
@@ -25,6 +25,7 @@ class _SignupformState extends State<Signupform> {
     String lastName = _lastNameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
+    final repository = SignUpRepository();
 
     if (isNotEmpty(firstName, lastName, email, password)) {
       User newUser = User(
@@ -32,7 +33,7 @@ class _SignupformState extends State<Signupform> {
           lastName: lastName,
           email: email,
           password: password);
-      bool otpSent = await SignUpUser.sendOtpUser(email);
+      bool otpSent = await repository.sendOtp(email);
       if (otpSent) {
         if (!mounted) return;
         Navigator.push(
@@ -65,53 +66,6 @@ class _SignupformState extends State<Signupform> {
       );
     }
   }
-
-  // void _signUp() async {
-  //   String firstName = _firstNameController.text;
-  //   String lastName = _lastNameController.text;
-  //   String email = _emailController.text;
-  //   String password = _passwordController.text;
-
-  //   print("\nSign up btn clicked.");
-
-  //   if (isNotEmpty(firstName, lastName, email, password)) {
-  //     User user = User(
-  //         firstName: firstName,
-  //         lastName: lastName,
-  //         email: email,
-  //         password: password);
-  //     bool isSignUp = await signUpUser(user);
-  //     if (isSignUp) {
-  //       if (!mounted) return;
-  //       Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => OtpVerificationScreen(
-  //               email: email,
-  //             ),
-  //           ));
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           clipBehavior: Clip.antiAlias,
-  //           behavior: SnackBarBehavior.floating,
-  //           content: Text('Otp sent successfully'),
-  //           backgroundColor: Colors.deepPurple,
-  //         ),
-  //       );
-  //       _firstNameController.clear();
-  //       _lastNameController.clear();
-  //       _emailController.clear();
-  //       _passwordController.clear();
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Please fill all fields'),
-  //         backgroundColor: Colors.deepPurple,
-  //       ),
-  //     );
-  //   }
-  // }
 
   Widget _createAccountBtn() {
     return SizedBox(

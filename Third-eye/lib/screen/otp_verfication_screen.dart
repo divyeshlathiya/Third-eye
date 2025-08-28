@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:thirdeye/auth/sign_up.dart';
 import 'package:thirdeye/models/User.dart';
+import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/verified_screen.dart';
 
 import 'package:thirdeye/sharable_widget/button.dart';
@@ -21,6 +21,7 @@ class OtpVerificationScreen extends StatefulWidget {
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   late final String _email = widget.email;
   final TextEditingController _otpController = TextEditingController();
+  final _repository = SignUpRepository();
 
   int _secondsRemaining = 30;
   Timer? _timer;
@@ -32,27 +33,24 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     _startTimer();
   }
 
-  void _verifyOtpAndAccount(String otp) async {
-    bool isValid = await SignUpUser.verifyOtp(widget.email, otp);
-    if (isValid) {
-      bool registered = await SignUpUser.signUpUser(widget.user);
+  void _verifyOtp() async {
+    final otp = _otpController.text.trim();
+    bool validOtp = await _repository.verifyOtp(widget.email, otp);
+    if (validOtp) {
+      bool registered = await _repository.registerUser(widget.user);
       if (registered) {
         if (!mounted) return;
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VerifiedScreen(),
-            ));
+            context, MaterialPageRoute(builder: (_) => VerifiedScreen()));
         CustomSnackBar.showCustomSnackBar(
             context, "User registered successfully");
       } else {
         if (!mounted) return;
-        CustomSnackBar.showCustomSnackBar(
-            context, "Error in user registration");
+        CustomSnackBar.showCustomSnackBar(context, "Error registering user");
       }
     } else {
       if (!mounted) return;
-      CustomSnackBar.showCustomSnackBar(context, "Please enter valid otp.");
+      CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
     }
   }
 
@@ -185,8 +183,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               ),
               SizedBox(height: screenHeight * 0.35),
               MyButton(
-                  buttonLabel: "Verify account",
-                  onPressed: () => _verifyOtpAndAccount(_otpController.text))
+                  buttonLabel: "Verify account", onPressed: () => _verifyOtp())
             ],
           ),
         ),

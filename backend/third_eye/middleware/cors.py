@@ -10,6 +10,8 @@ def add_cors_middleware(app: FastAPI):
         "http://192.168.1.77:xxxx",
         "http://10.47.125.29:8000",
         "http://10.47.125.53:8000",
+        "http://192.168.1.159:8000",
+        "http://192.168.1.90:8000",
         "*"                              # TEMP: Allow all for dev
     ]
 

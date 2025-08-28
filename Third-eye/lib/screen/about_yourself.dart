@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:thirdeye/dashboard/dashboard.dart';
+import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
 

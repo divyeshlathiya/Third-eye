@@ -1,5 +1,5 @@
 from fastapi_mail import FastMail, MessageSchema, MessageType
-from config.email_config import conf
+from ..config.email_config import conf
 
 
 async def send_otp_email(to_email: str, otp: str):

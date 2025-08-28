@@ -6,7 +6,7 @@ import 'package:thirdeye/Menu/faq.dart';
 import 'package:thirdeye/Menu/past_score.dart';
 import 'package:thirdeye/Menu/reset_password.dart';
 import 'package:thirdeye/Menu/terms_condition.dart';
-import 'package:thirdeye/dashboard/dashboard.dart';
+import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/login_screen.dart';
 
 class MenuDrawer extends StatelessWidget {
