@@ -64,3 +64,5 @@ MANIFEST
 *.mo
 *.pyd
 
+
+**/*.json

@@ -1,14 +1,20 @@
 from datetime import timedelta
+import json
 from firebase_admin import auth, credentials, initialize_app
 from fastapi import APIRouter, HTTPException
 import firebase_admin
 from ..schemas.token import TokenRequest
 from ..auth.auth import create_access_token, create_refresh_token
+import os
 
-
-# Only initialize once (you can put this in main.py too)
+# Initialize Firebase only once
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_key.json")
+    firebase_key = os.getenv("FIREBASE_KEY")
+    if not firebase_key:
+        raise RuntimeError("FIREBASE_KEY env variable not set")
+
+    firebase_dict = json.loads(firebase_key)  # Parse JSON string
+    cred = credentials.Certificate(firebase_dict)
     initialize_app(cred)
 
 router = APIRouter(prefix="/auth")
