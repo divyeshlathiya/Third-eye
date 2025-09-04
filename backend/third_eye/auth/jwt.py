@@ -43,3 +43,17 @@ def decode_access_token(token: str):
         return jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
     except JWTError:
         return None
+
+def issue_tokens(user_email: str):
+    access_token = create_access_token(
+        data={"sub": user_email},
+        expire_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    refresh_token = create_refresh_token(
+        data={"sub": user_email},
+        expire_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }

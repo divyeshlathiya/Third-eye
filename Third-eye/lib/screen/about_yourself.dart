@@ -160,7 +160,7 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(  
+                        MaterialPageRoute(
                           builder: (context) => DashboardScreen(),
                         ));
                   })

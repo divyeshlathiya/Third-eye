@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thirdeye/repositories/auth_repositories.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class Loginform extends StatefulWidget {
   const Loginform({super.key});
@@ -29,12 +30,15 @@ class _LoginformState extends State<Loginform> {
 
       if (!mounted) return;
       if (isLoggedIn) {
+        String? firstName = await StorageHelper.getToken('first_name');
+        if (!mounted) return;
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => DashboardScreen(),
             ));
-        CustomSnackBar.showCustomSnackBar(context, "Welcome $username");
+        CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
+            backgroundColor: Colors.purple);
       } else {
         CustomSnackBar.showCustomSnackBar(context, "Invalid email or password",
             backgroundColor: Colors.red);

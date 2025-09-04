@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:thirdeye/repositories/user_repositories.dart';
+import 'package:thirdeye/sharable_widget/snack_bar.dart';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -12,21 +16,94 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final TextEditingController _firstName = TextEditingController();
-  final TextEditingController _lastName = TextEditingController();
-  final TextEditingController _dob = TextEditingController(text: '19/06/2005');
-  final TextEditingController _email = TextEditingController();
+  final _profileRepository = ProfileRepository();
+  DateTime? _picked;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  late final TextEditingController _firstName = TextEditingController();
+  late final TextEditingController _lastName = TextEditingController();
+  late final TextEditingController _dob = TextEditingController();
+  late final TextEditingController _email = TextEditingController();
   String? selectedGender;
   File? _profileImage;
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  String formatDobForDisplay(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
 
-    if (pickedFile != null) {
+  String formatDobForBackend({DateTime? picked, String? textFieldValue}) {
+    if (picked != null) {
+      return "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+    } else if (textFieldValue != null && textFieldValue.isNotEmpty) {
+      try {
+        List<String> parts = textFieldValue.split('/');
+        if (parts.length == 3) {
+          return "${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}";
+        }
+      } catch (e) {
+        debugPrint("DOB backend formatting error: $e");
+      }
+    }
+    return "";
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await _profileRepository.fetchProfile();
+
+    if (profile != null) {
       setState(() {
-        _profileImage = File(pickedFile.path);
+        _firstName.text = profile['first_name'] ?? '';
+        _lastName.text = profile['last_name'] ?? '';
+        _email.text = profile['email'] ?? '';
+
+        if (profile['dob'] != null && profile['dob'].toString().isNotEmpty) {
+          try {
+            DateTime parsedDob = DateTime.parse(profile['dob']);
+            _dob.text = formatDobForDisplay(parsedDob); // user-friendly
+          } catch (e) {
+            debugPrint("DOB parsing error: $e");
+            _dob.text = profile['dob']; // fallback
+          }
+        }
+
+        if (profile['gender'] != null &&
+            profile['gender'].toString().isNotEmpty) {
+          selectedGender = profile['gender'].toString().trim().toUpperCase();
+        } else {
+          selectedGender = null;
+        }
+
+        // if (profile['profile_pic'] != null) {
+        //   _profileImage = File(profile['profile_pic']);
+        //   // ⚠️ If it's a URL from Firebase, use NetworkImage in CircleAvatar
+        // }
       });
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    final updatedData = {
+      "first_name": _firstName.text.trim(),
+      "last_name": _lastName.text.trim(),
+      "dob": formatDobForBackend(picked: _picked, textFieldValue: _dob.text),
+      "gender": selectedGender,
+    };
+
+    final result = await _profileRepository.updateProfile(updatedData);
+
+    if (result != null) {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(
+          context, "Profile updated successfully.");
+      Navigator.pop(context);
+    } else {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Failed to update profile");
     }
   }
 
@@ -71,6 +148,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Future<void> _pickImageAndUpload() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+
+      // Upload to Firebase
+      String userId = "123"; // replace with logged-in user id
+      String? url = await uploadProfilePic(_profileImage!, userId);
+      if (url != null) {
+        debugPrint("Uploaded! Download URL: $url");
+      }
+    }
+  }
+
+  Future<String?> uploadProfilePic(File imageFile, String userId) async {
+    try {
+      // Create a reference with userId (unique folder per user)
+      final storageRef =
+          FirebaseStorage.instance.ref().child("profile_pics/$userId.jpg");
+
+      // Upload the file
+      await storageRef.putFile(imageFile);
+
+      // Get the download URL
+      String downloadUrl = await storageRef.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      debugPrint("Error uploading image: $e");
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,8 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     radius: 50,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
-                        : const AssetImage('icons/profile.png')
-                            as ImageProvider,
+                        : const AssetImage('agna.png') as ImageProvider,
                   ),
                   Positioned(
                     bottom: 0,
@@ -110,7 +222,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.edit, color: Colors.white),
-                        onPressed: _pickImage,
+                        onPressed: _pickImageAndUpload,
                       ),
                     ),
                   ),
@@ -179,6 +291,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 8),
             TextField(
+              readOnly: true,
               controller: _email,
               decoration: InputDecoration(
                 hintText: 'Enter your email',
@@ -221,9 +334,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                _genderButton("Female", "icons/female.svg"),
+                _genderButton("FEMALE", "icons/female.svg"),
                 const SizedBox(width: 12),
-                _genderButton("Male", "icons/male.svg"),
+                _genderButton("MALE", "icons/male.svg"),
               ],
             ),
             const SizedBox(height: 20),
@@ -232,9 +345,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: _saveProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3E2C96),
                   shape: RoundedRectangleBorder(
@@ -258,15 +369,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    _picked = await showDatePicker(
       context: context,
       initialDate: DateTime(2005, 6, 19),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
+    if (_picked != null) {
       setState(() {
-        _dob.text = "${picked.day}/${picked.month}/${picked.year}";
+        _dob.text =
+            "${_picked?.year}-${_picked?.month.toString().padLeft(2, '0')}-${_picked?.day.toString().padLeft(2, '0')}";
       });
     }
   }

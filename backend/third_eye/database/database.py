@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# DATABASE_URL = "sqlite:///./auth.db"
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = "sqlite:///./auth.db"
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Detect SQLite
 if DATABASE_URL.startswith("sqlite"):
@@ -18,3 +18,10 @@ else:
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

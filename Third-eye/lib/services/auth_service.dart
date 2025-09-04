@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/urls.dart';
-import '../utils/storage_helper.dart';
 
 class AuthService {
   static Future<Map<String, dynamic>?> login(
@@ -35,7 +34,20 @@ class AuthService {
     return null;
   }
 
-  Future<void> logout() async {
-    await StorageHelper.clearAll();
+  static Future<Map<String, dynamic>?> getProfile(String accessToken) async {
+    final url = Uri.parse(ConfigURL.fetchProfile);
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    }
+    return null;
   }
 }

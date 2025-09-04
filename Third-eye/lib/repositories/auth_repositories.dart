@@ -10,6 +10,10 @@ class AuthRepository {
         data.containsKey('refresh_token')) {
       await StorageHelper.saveToken('access_token', data['access_token']);
       await StorageHelper.saveToken('refresh_token', data['refresh_token']);
+
+      if (data.containsKey('first_name')) {
+        await StorageHelper.saveToken('first_name', data['first_name']);
+      }
       return true;
     }
     return false;
@@ -33,5 +37,12 @@ class AuthRepository {
 
   Future<String?> getAccessToken() async {
     return await StorageHelper.getToken('access_token');
+  }
+
+  Future<Map<String, dynamic>?> fetchProfile() async {
+    final accessToken = await getAccessToken();
+    if (accessToken == null) return null;
+
+    return await AuthService.getProfile(accessToken);
   }
 }

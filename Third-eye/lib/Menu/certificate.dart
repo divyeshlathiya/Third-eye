@@ -26,13 +26,14 @@ class CertificateScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 525,
-              child: Image.asset(
-                'certificate.png',
-                fit: BoxFit.cover,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("Certificate.png"),
+                  fit: BoxFit.cover, // optional: scales image properly
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            // Action Buttons
             Row(
               children: [
                 Expanded(

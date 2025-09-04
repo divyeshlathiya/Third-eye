@@ -103,20 +103,52 @@ class QuestionScreen extends StatelessWidget {
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),
+                  // itemBuilder: (context, index) {
+                  //   return GestureDetector(
+                  //     onLongPress: () => _showPreview(context, index),
+                  //     child: Container(
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.purple[100 * ((index % 8) + 1)],
+                  //         borderRadius: BorderRadius.circular(12),
+                  //       ),
+                  //       child: Center(
+                  //         child: Text(
+                  //           "Box ${index + 1}",
+                  //           style: const TextStyle(
+                  //             fontSize: 14,
+                  //             fontWeight: FontWeight.w500,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   );
+                  // },
                   itemBuilder: (context, index) {
+                    final isDisabled =
+                        index == 3 || index == 5; // 4th and 6th box
+
                     return GestureDetector(
-                      onLongPress: () => _showPreview(context, index),
+                      onLongPress: isDisabled
+                          ? null
+                          : () => _showPreview(context, index),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.purple[100 * ((index % 8) + 1)],
+                          color: isDisabled
+                              ? Colors.transparent
+                              : Colors.purple[100 * ((index % 8) + 1)],
                           borderRadius: BorderRadius.circular(12),
+                          border: isDisabled
+                              ? Border.all(
+                                  color: Colors.grey, style: BorderStyle.solid)
+                              : null,
                         ),
                         child: Center(
                           child: Text(
                             "Box ${index + 1}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
+                              color: isDisabled ? Colors.grey : Colors.black,
                             ),
                           ),
                         ),

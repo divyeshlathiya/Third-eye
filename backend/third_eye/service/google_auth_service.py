@@ -4,7 +4,7 @@ from firebase_admin import auth, credentials, initialize_app
 from fastapi import APIRouter, HTTPException
 import firebase_admin
 from ..schemas.token import TokenRequest
-from ..auth.auth import create_access_token, create_refresh_token
+from ..auth.jwt import create_access_token, create_refresh_token
 import os
 
 # Initialize Firebase only once

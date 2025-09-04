@@ -2,10 +2,31 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thirdeye/Menu/menu.dart';
 import 'package:thirdeye/screen/play_quiz_screen.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 // import 'package:thirdeye/screen/about_yourself.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  String? firstName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFirstName();
+  }
+
+  Future<void> _loadFirstName() async {
+    final name = await StorageHelper.getToken('first_name');
+    setState(() {
+      firstName = name ?? "User";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +70,7 @@ class DashboardScreen extends StatelessWidget {
                 // Greeting and Name
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'Good Morning!',
                       style: TextStyle(
@@ -58,7 +79,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Jenny Wilson',
+                      firstName ?? "Loading",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
