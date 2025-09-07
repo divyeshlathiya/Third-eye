@@ -30,12 +30,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Builder(
+          builder: (context) {
+            double width = MediaQuery.of(context).size.width;
+            return Text(
+              "Dashboard",
+              style: TextStyle(
+                fontSize: width * 0.045, // responsive scaling
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
         elevation: 0,
         backgroundColor: Colors.white,
@@ -43,15 +54,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(width * 0.04),
         child: Column(
           children: [
             Row(
               children: [
                 // Profile Image
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: width * 0.12, // responsive
+                  height: width * 0.12,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
@@ -61,11 +72,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     //   'icons/profile.png',
                     //   fit: BoxFit.cover,
                     // ),
-                    child: Icon(Icons.person),
+                    child: Icon(Icons.person, size: width * 0.07),
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                SizedBox(width: width * 0.03),
 
                 // Greeting and Name
                 Column(
@@ -74,14 +85,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       'Good Morning!',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: width * 0.03,
                         color: Colors.grey,
                       ),
                     ),
                     Text(
                       firstName ?? "Loading",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: width * 0.04,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -100,11 +111,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           builder: (context) => const MenuDrawer(),
                         ));
                   },
-                  icon: const Icon(Icons.menu, size: 24),
+                  icon: Icon(
+                    Icons.menu,
+                    size: width * 0.07,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -116,16 +130,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(width * 0.05),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Start Your 21-Days journey to\nBoost mental clarity & Emotional wellness.",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                        textAlign: TextAlign.center,
+                      SizedBox(height: height * 0.02),
+                      Builder(
+                        builder: (context) {
+                          double width = MediaQuery.of(context).size.width;
+                          return Text(
+                            "Start Your 21-Days journey to\nBoost mental clarity & Emotional wellness.",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: width * 0.045, // responsive font size
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          );
+                        },
                       ),
-                      const SizedBox(height: 5),
+                      SizedBox(height: height * 0.015),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -136,16 +159,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         child: Image.asset(
                           'assets/agna.png',
-                          width: 250,
-                          height: 250,
+                          width: width * 0.65,
+                          height: height * 0.3,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const Spacer(),
+
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white),
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: height * 0.018),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                )),
                             onPressed: () {
                               Navigator.push(
                                   context,
@@ -155,105 +184,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             },
                             child: Text(
                               "Start Quiz",
-                              style: TextStyle(color: Color(0xFF4B1FA1)),
+                              style: TextStyle(
+                                color: const Color(0xFF4B1FA1),
+                                fontSize: width * 0.045,
+                                fontWeight: FontWeight.w600,
+                              ),
                             )),
                       ),
-                      const SizedBox(height: 20),
+                       SizedBox(height: height * 0.025),
                       // Updated Score and Past Score section with icons
+                       SizedBox(height: height * 0.025),
+
+                      // Score & Past Score Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Score Card with icon
                           Expanded(
-                            child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "36",
-                                          style: TextStyle(
-                                            fontSize: 32,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF4B1FA1),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.emoji_events,
-                                          color: Color(0xFF4B1FA1),
-                                          size: 32,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Score",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color:
-                                            Color(0xFF4B1FA1).withOpacity(0.7),
-                                      ),
-                                    ),
-                                  ],
-                                )),
+                            child: _buildScoreCard(
+                              context,
+                              title: "Score",
+                              value: "36",
+                              icon: Icons.emoji_events,
+                            ),
                           ),
-
-                          // Past Score Card with icon
                           Expanded(
-                            child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "109",
-                                          style: TextStyle(
-                                            fontSize: 32,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF4B1FA1),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.history,
-                                          color: Color(0xFF4B1FA1),
-                                          size: 32,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "View Past Score",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color:
-                                            Color(0xFF4B1FA1).withOpacity(0.7),
-                                      ),
-                                    ),
-                                  ],
-                                )),
+                            child: _buildScoreCard(
+                              context,
+                              title: "View Past Score",
+                              value: "109",
+                              icon: Icons.history,
+                            ),
                           ),
                         ],
                       ),
@@ -264,6 +224,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+  Widget _buildScoreCard(BuildContext context,
+      {required String title, required String value, required IconData icon}) {
+    final width = MediaQuery.of(context).size.width;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.all(width * 0.04),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: width * 0.08,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF4B1FA1),
+                ),
+              ),
+              SizedBox(width: width * 0.02),
+              Icon(icon, color: const Color(0xFF4B1FA1), size: width * 0.09),
+            ],
+          ),
+          SizedBox(height: 8),
+          FittedBox(
+            // ✅ ensures text resizes and stays in one line
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: width * 0.045,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF4B1FA1).withOpacity(0.7),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

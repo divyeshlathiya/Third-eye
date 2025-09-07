@@ -132,11 +132,19 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:thirdeye/screen/choose_img.dart';
+import 'package:thirdeye/screen/questions/question1_screen.dart';
+import 'package:thirdeye/screen/questions/question2_screen.dart';
+import 'package:thirdeye/screen/questions/question3_screen.dart';
+import 'package:thirdeye/screen/questions/question4_screen.dart';
 
-class WellnessScreen extends StatelessWidget {
-  WellnessScreen({super.key});
+class WellnessScreen extends StatefulWidget {
+  const WellnessScreen({super.key});
 
+  @override
+  State<WellnessScreen> createState() => _WellnessScreenState();
+}
+
+class _WellnessScreenState extends State<WellnessScreen> {
   // Box count for each column (left to right)
   final List<int> boxCounts = [3, 5, 7, 9];
 
@@ -171,13 +179,35 @@ class WellnessScreen extends StatelessWidget {
   }
 
   // Handle tap
-  void onColumnTap(BuildContext context, int index) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuizScreen(columnIndex: index),
-      ),
-    );
+  void onColumnTap(int index) {
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Question1Screen()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Question2Screen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Question3Screen()),
+        );
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Question4Screen()),
+        );
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -220,7 +250,7 @@ class WellnessScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(boxCounts.length, (index) {
                       return GestureDetector(
-                        onTap: () => onColumnTap(context, index),
+                        onTap: () => onColumnTap(index),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: buildColumn(
@@ -235,9 +265,7 @@ class WellnessScreen extends StatelessWidget {
                     }),
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
@@ -250,8 +278,10 @@ class WellnessScreen extends StatelessWidget {
                       minimumSize: const Size.fromHeight(50),
                     ),
                     onPressed: () {},
-                    child:
-                        const Text('Continue', style: TextStyle(fontSize: 16)),
+                    child: const Text(
+                      'Continue',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -323,26 +353,6 @@ class _BlinkingBoxState extends State<BlinkingBox>
           ),
         ),
       ),
-    );
-  }
-}
-
-class QuizScreen extends StatelessWidget {
-  final int columnIndex;
-
-  const QuizScreen({super.key, required this.columnIndex});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Quiz for Column ${columnIndex + 1}')),
-      // body: Center(
-      //   child: Text(
-      //     'This is screen for column ${columnIndex + 1}.',
-      //     style: const TextStyle(fontSize: 20),
-      //   ),
-      // ),
-      body: QuestionScreen(),
     );
   }
 }
