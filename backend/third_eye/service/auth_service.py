@@ -76,7 +76,7 @@ def verify_email_otp(data: OtpVerifyRequest):
 @user_router.get("/me")
 def get_profile(current_user: User = Depends(get_current_user)):
     if not current_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=401, detail="Unauhthrized")
 
     return {
         "first_name": current_user.first_name,
@@ -105,6 +105,7 @@ def update_dob_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
 
 @user_router.patch("/me/profile", response_model=ShowUser)
 def update_profile(
@@ -178,6 +179,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     return {
         "status": "success",
+        "id": user.id,
         "email": user.email,
         "first_name": user.first_name,
         "access_token": tokens["access_token"],

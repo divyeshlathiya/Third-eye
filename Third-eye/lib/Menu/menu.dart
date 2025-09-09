@@ -7,8 +7,10 @@ import 'package:thirdeye/Menu/past_score.dart';
 import 'package:thirdeye/Menu/reset_password.dart';
 import 'package:thirdeye/Menu/terms_condition.dart';
 import 'package:thirdeye/repositories/auth_repositories.dart';
+import 'package:thirdeye/repositories/google_auth_repository.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/login_screen.dart';
+import 'package:thirdeye/services/google_auth_service.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 
 class MenuDrawer extends StatefulWidget {
@@ -154,8 +156,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   const SizedBox(height: 20),
                   // Logout Button
                   ListTile(
-                    leading: const Icon(Icons.logout,
-                        color: const Color(0xFF4B1FA1)),
+                    leading: const Icon(Icons.logout, color: Color(0xFF4B1FA1)),
                     title: const Text(
                       "Logout",
                       style: TextStyle(
@@ -205,9 +206,13 @@ void _navigateTo(BuildContext context, Widget screen) {
   );
 }
 
-void _logout(BuildContext context) {
+void _logout(BuildContext context) async {
   AuthRepository repo = AuthRepository();
   repo.logout();
+
+  GoogleAuthRepository googleRepo = GoogleAuthRepository(GoogleAuthService());
+  await googleRepo.signOut();
+
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(builder: (context) => const LoginScreen()),

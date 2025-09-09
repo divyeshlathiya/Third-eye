@@ -9,7 +9,8 @@ class ProfileRepository {
     return await ProfileService.fetchProfile(accessToken);
   }
 
-  Future<Map<String, dynamic>?> updateProfile(Map<String, dynamic> profileData) async {
+  Future<Map<String, dynamic>?> updateProfile(
+      Map<String, dynamic> profileData) async {
     final accessToken = await StorageHelper.getToken('access_token');
     if (accessToken == null) return null;
 

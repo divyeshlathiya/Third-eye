@@ -3,6 +3,7 @@ from ..database.database import Base
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.orm import relationship
+from .user_streak import UserStreak
 
 
 class User(Base):
@@ -20,6 +21,7 @@ class User(Base):
     last_name = Column(String, index=True, nullable=False)
     email = Column(String, index=True, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    provider = Column(String, default="email")
     gender = Column(String, nullable=True)
     dob = Column(Date, nullable=True)
     profile_pic = Column(String, nullable=True)
@@ -34,4 +36,13 @@ class User(Base):
         onupdate=func.now(),
         nullable=False
     )
-    quiz_scores = relationship("QuizScore",back_populates="user",cascade="all,delete")
+    quiz_scores = relationship(
+        "QuizScore",
+        back_populates="user",
+        cascade="all,delete"
+    )
+    streak = relationship(
+        "UserStreak",
+        back_populates="user",
+        uselist=False
+    )

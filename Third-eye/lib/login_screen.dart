@@ -6,6 +6,7 @@ import 'package:thirdeye/loginform.dart';
 import 'package:thirdeye/services/google_auth_service.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/signupform.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,25 +16,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // void _googleLogin() async {
-  //   final user = await SignInWithGoogle.signInWithGoogle();
-  //   if (!mounted) return;
-  //   if (user != null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Welcome ${user.displayName}")),
-  //     );
-
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => DashboardScreen()),
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text("Google Sign-In failed")),
-  //     );
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -57,10 +39,15 @@ class _LoginScreenState extends State<LoginScreen> {
     final repo = GoogleAuthRepository(GoogleAuthService());
 
     final userData = await repo.signInWithGoogle();
-    if (!mounted) return;
+    print(userData.toString());
 
     if (userData != null) {
-      CustomSnackBar.showCustomSnackBar(context, "Welcome ${userData['name']}",
+      await StorageHelper.saveToken("first_name", userData['first_name'] ?? "");
+
+      final firstName = userData['first_name'] ?? "User";
+      // debugPrint("***** Welcome! $firstName ******");
+
+      CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
           backgroundColor: Colors.purple);
 
       Navigator.pushReplacement(
