@@ -16,4 +16,11 @@ class ProfileRepository {
 
     return await ProfileService.updateProfile(accessToken, profileData);
   }
+
+  Future<Map<String, dynamic>?> updateDobGender(
+      String? accessToken, String dob, String gender) async {
+    if (accessToken == null) return null;
+
+    return await ProfileService.updateDobGender(accessToken, dob, gender);
+  }
 }

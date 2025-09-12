@@ -30,7 +30,10 @@ class VerifiedScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 MyButton(
-                  buttonLabel: "Start",
+                  child: Text(
+                    "Start",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   onPressed: () {
                     Navigator.pushReplacement(
                         context,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thirdeye/repositories/auth_repositories.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
+import 'package:thirdeye/screen/forgot_password_screen.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 
@@ -155,7 +156,13 @@ class _LoginformState extends State<Loginform> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ForgotPasswordScreen(),
+                              ));
+                        },
                         child: const Text("Forgot Password?",
                             style: TextStyle(color: Colors.blue)),
                       ),

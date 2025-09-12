@@ -19,6 +19,56 @@ class _SignupformState extends State<Signupform> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
+
+  // void _createAccount() async {
+  //   String firstName = _firstNameController.text;
+  //   String lastName = _lastNameController.text;
+  //   String email = _emailController.text;
+  //   String password = _passwordController.text;
+  //   final repository = SignUpRepository();
+
+  //   if (isNotEmpty(firstName, lastName, email, password)) {
+  //     setState(() => isLoading = true);
+  //     User newUser = User(
+  //         firstName: firstName,
+  //         lastName: lastName,
+  //         email: email,
+  //         password: password);
+  //     bool otpSent = await repository.sendOtp(email);
+  //     setState(() => isLoading = false);
+  //     if (!mounted) return;
+  //     if (otpSent) {
+  //       Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => OtpVerificationScreen(
+  //               email: email,
+  //               user: newUser,
+  //             ),
+  //           ));
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           clipBehavior: Clip.antiAlias,
+  //           behavior: SnackBarBehavior.floating,
+  //           content: Text('Otp sent successfully'),
+  //           backgroundColor: Colors.deepPurple,
+  //         ),
+  //       );
+  //       _firstNameController.clear();
+  //       _lastNameController.clear();
+  //       _emailController.clear();
+  //       _passwordController.clear();
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Please fill all fields'),
+  //         backgroundColor: Colors.deepPurple,
+  //       ),
+  //     );
+  //   }
+  // }
 
   void _createAccount() async {
     String firstName = _firstNameController.text;
@@ -28,34 +78,54 @@ class _SignupformState extends State<Signupform> {
     final repository = SignUpRepository();
 
     if (isNotEmpty(firstName, lastName, email, password)) {
+      setState(() => isLoading = true); // show loader
+
       User newUser = User(
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          password: password);
-      bool otpSent = await repository.sendOtp(email);
-      if (otpSent) {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      );
+
+      try {
+        bool otpSent = await repository.sendOtp(email, "signup");
+
         if (!mounted) return;
-        Navigator.push(
+        setState(() => isLoading = false); // hide loader
+
+        if (otpSent) {
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => OtpVerificationScreen(
                 email: email,
                 user: newUser,
               ),
-            ));
+            ),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              clipBehavior: Clip.antiAlias,
+              behavior: SnackBarBehavior.floating,
+              content: Text('Otp sent successfully'),
+              backgroundColor: Colors.deepPurple,
+            ),
+          );
+
+          _firstNameController.clear();
+          _lastNameController.clear();
+          _emailController.clear();
+          _passwordController.clear();
+        }
+      } catch (e) {
+        setState(() => isLoading = false); // hide loader
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            clipBehavior: Clip.antiAlias,
-            behavior: SnackBarBehavior.floating,
-            content: Text('Otp sent successfully'),
-            backgroundColor: Colors.deepPurple,
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
           ),
         );
-        _firstNameController.clear();
-        _lastNameController.clear();
-        _emailController.clear();
-        _passwordController.clear();
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +141,7 @@ class _SignupformState extends State<Signupform> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _createAccount,
+        onPressed: isLoading ? null : _createAccount,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
@@ -79,13 +149,16 @@ class _SignupformState extends State<Signupform> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           backgroundColor: const Color(0xFF362491), // Purpl  e shade
         ),
-        child: const Text(
-          "Create Account",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        child: isLoading
+            ? SizedBox(
+                width: 20, height: 20, child: CircularProgressIndicator())
+            : const Text(
+                "Create Account",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
@@ -157,18 +230,23 @@ class _SignupformState extends State<Signupform> {
                       child: MyTextFeild(
                     controller: _firstNameController,
                     hintText: "John",
+                    labelText: "First name",
                   )),
                   const SizedBox(width: 10),
                   Expanded(
                       child: MyTextFeild(
                     controller: _lastNameController,
                     hintText: "Doe",
+                    labelText: "Last name",
                   )),
                 ],
               ),
               const SizedBox(height: 20),
               MyTextFeild(
-                  controller: _emailController, hintText: "Enter your email"),
+                controller: _emailController,
+                hintText: "Enter your email",
+                labelText: "Email",
+              ),
               const SizedBox(height: 20),
               CustomPasswordTextFeild(
                 controller: _passwordController,

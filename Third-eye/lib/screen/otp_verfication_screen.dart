@@ -2,17 +2,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:thirdeye/models/User.dart';
 import 'package:thirdeye/repositories/sign_up_repository.dart';
-import 'package:thirdeye/screen/verified_screen.dart';
+import 'package:thirdeye/screen/about_yourself.dart';
 
 import 'package:thirdeye/sharable_widget/button.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/sharable_widget/text_feild.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen(
-      {super.key, required this.email, required this.user});
+  const OtpVerificationScreen({super.key, required this.email, this.user});
   final String email;
-  final User user;
+  final User? user;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -22,6 +21,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   late final String _email = widget.email;
   final TextEditingController _otpController = TextEditingController();
   final _repository = SignUpRepository();
+  bool isLoading = false;
 
   int _secondsRemaining = 30;
   Timer? _timer;
@@ -35,22 +35,69 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   void _verifyOtp() async {
     final otp = _otpController.text.trim();
-    bool validOtp = await _repository.verifyOtp(widget.email, otp);
-    if (validOtp) {
-      bool registered = await _repository.registerUser(widget.user);
-      if (registered) {
+
+    if (otp.isEmpty) {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Please enter OTP");
+      return;
+    }
+    setState(() => isLoading = true);
+
+    try {
+      bool validOtp = await _repository.verifyOtp(widget.email, otp, "signup");
+      if (!mounted) return;
+      if (validOtp) {
+        final registered = await _repository.registerUser(widget.user!);
         if (!mounted) return;
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => VerifiedScreen()));
-        CustomSnackBar.showCustomSnackBar(
-            context, "User registered successfully");
+
+        if (registered != null) {
+          final accessToken = registered["tokens"]["access_token"];
+
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => AboutYourSelfScreen(
+                        accessToken: accessToken,
+                      )));
+          // CustomSnackBar.showCustomSnackBar(
+          //     context, "User registered successfully");
+        } else {
+          if (!mounted) return;
+          CustomSnackBar.showCustomSnackBar(context, "Error registering user");
+        }
       } else {
         if (!mounted) return;
-        CustomSnackBar.showCustomSnackBar(context, "Error registering user");
+        CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
       }
-    } else {
+    } catch (e) {
       if (!mounted) return;
-      CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
+      CustomSnackBar.showCustomSnackBar(
+        context,
+        "Something went wrong: $e",
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  void _resendOtp() async {
+    setState(() => isLoading = true);
+    try {
+      bool otpSent =
+          await _repository.sendOtp(_email, "signup"); // purpose can be dynamic
+      if (!mounted) return;
+
+      if (otpSent) {
+        CustomSnackBar.showCustomSnackBar(context, "OTP resent successfully");
+        _startTimer();
+      } else {
+        CustomSnackBar.showCustomSnackBar(context, "Failed to resend OTP");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Error resending OTP: $e");
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -150,7 +197,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               const SizedBox(height: 10),
               MyTextFeild(
                 controller: _otpController,
-                hintText: "4 Digit code",
+                labelText: "4 Digit code",
               ),
               const SizedBox(height: 20),
               Row(
@@ -158,12 +205,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 children: [
                   const Text("Didn't receive Code?"),
                   TextButton(
-                    onPressed: _canResend
-                        ? () {
-                            // Resend OTP logic here
-                            _startTimer();
-                          }
-                        : null,
+                    onPressed: _canResend ? _resendOtp : null,
                     style: TextButton.styleFrom(
                       foregroundColor: _canResend ? Colors.blue : Colors.grey,
                     ),
@@ -183,7 +225,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               ),
               SizedBox(height: screenHeight * 0.35),
               MyButton(
-                  buttonLabel: "Verify account", onPressed: () => _verifyOtp())
+                onPressed: isLoading ? null : _verifyOtp,
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        "Verify OTP",
+                        style: TextStyle(color: Colors.white),
+                      ),
+              ),
             ],
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageHelper {
   // Create storage instance
@@ -21,4 +22,18 @@ class StorageHelper {
   }
 
   static Future<void> saveData(String s, email) async {}
+}
+
+class PrefsHelper {
+  static const String _seenOnboardingKey = 'seen_onboarding';
+
+  static Future<void> setOnboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_seenOnboardingKey, true);
+  }
+
+  static Future<bool> hasSeenOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_seenOnboardingKey) ?? false;
+  }
 }

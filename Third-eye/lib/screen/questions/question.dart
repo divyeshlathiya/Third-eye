@@ -1,8 +1,10 @@
-import 'dart:ui';
+  import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:thirdeye/repositories/scores_repositories.dart';
 import 'package:thirdeye/screen/result_screen.dart';
 import 'package:thirdeye/sharable_widget/global_data.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class QuestionScreen extends StatefulWidget {
   final int columnIndex;
@@ -11,6 +13,7 @@ class QuestionScreen extends StatefulWidget {
   final VoidCallback? onPrevious;
   final List<String> boxImages;
   final List<String>? boxTips;
+  final bool isMale;
 
   const QuestionScreen({
     super.key,
@@ -20,6 +23,7 @@ class QuestionScreen extends StatefulWidget {
     this.onPrevious,
     required this.boxImages,
     required this.boxTips,
+    required this.isMale,
   });
 
   @override
@@ -27,13 +31,68 @@ class QuestionScreen extends StatefulWidget {
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
-  final List<int> boxCounts = [3, 5, 7, 9];
-  final List<List<int>> boxPoints = [
+  String? firstName;
+  final _scoreRepository = ScoresRepositories();
+  final List<int> _baseBoxCounts = [3, 5, 7, 9];
+  final List<List<int>> _baseBoxPoints = [
     [0, 10, 0, 0, 0, 0, 0, -10, 0], // Question 1
     [20, 0, 10, 0, 0, 0, -10, 0, -20], // Question 2
     [30, 20, 10, 0, 0, 0, -10, -20, -30], // Question 3
     [40, 30, 20, 10, 0, -10, -20, -30, -40], // Question 4
   ];
+
+  // ✅ Use gender flag to decide
+  List<int> get boxCounts =>
+      widget.isMale ? _baseBoxCounts : _baseBoxCounts.reversed.toList();
+
+  List<List<int>> get boxPoints =>
+    widget.isMale ? _baseBoxPoints : _baseBoxPoints.reversed.toList();
+  bool get _allQuestionsAnswered {
+    return selectedBoxesPerColumn.length == boxCounts.length &&
+        // ignore: unnecessary_null_comparison
+        selectedBoxesPerColumn.values.every((value) => value != null);
+  }
+
+  Future<void> _saveScore() async {
+    try {
+      final result = await _scoreRepository.updateScore(
+        "Wellness Quiz",
+        totalscore,
+      );
+      final name = await StorageHelper.getToken('first_name');
+      setState(() {
+        firstName = name;
+      });
+
+      if (result != null) {
+        if (!mounted) return;
+
+        debugPrint("✅ Score updated: $result");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ResultScreen(
+              score: totalscore,
+              userName: firstName ?? "", // 👈 replace with actual user
+              day: 1,
+            ),
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to update score")),
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ Error saving score: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    }
+  }
 
   void _showPreview(BuildContext context, int index) {
     int points = boxPoints[widget.columnIndex][index];
@@ -90,7 +149,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void _selectBox(int index) {
     setState(() {
       selectedBoxesPerColumn[widget.columnIndex] = index;
-
+      int points = boxPoints[widget.columnIndex][index];
+      quizscore[widget.columnIndex] = points;
       // Reset score and recalc
       totalscore = 0;
       selectedBoxesPerColumn.forEach((qIndex, bIndex) {
@@ -111,7 +171,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         }
       }
     });
-
+    debugPrint("Scores per question: $quizscore");
     // debugPrint("Selections so far: $selectedBoxesPerColumn");
     // debugPrint("Combined Score so far: $totalscore");
     // debugPrint("Selected Tips so far: $selectedTips");
@@ -229,27 +289,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: selectedBox == null
-                          ? null
-                          : () {
-                              if (widget.columnIndex == boxCounts.length - 1) {
-                                // Last question → Navigate to result screen
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ResultScreen(
-                                      score: totalscore,
-                                      userName:
-                                          "Jenny Wilson", // pass dynamic name if available
-                                      day:
-                                          1, // pass dynamic day if you track it
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                widget.onNext?.call();
-                              }
-                            },
+                      onPressed: widget.columnIndex == boxCounts.length - 1
+                          ? (_allQuestionsAnswered
+                              ? _saveScore
+                              : null) // ✅ Only enable finish if all answered
+                          : (selectedBox == null
+                              ? null
+                              : widget.onNext
+                                  ?.call), // ✅ Next only if current answered
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF5A2DCE),
                         shape: RoundedRectangleBorder(
@@ -268,7 +315,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

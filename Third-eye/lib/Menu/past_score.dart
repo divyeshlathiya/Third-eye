@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:thirdeye/repositories/scores_repositories.dart';
 
-// Example backend response model
+// ✅ Backend response model
 class StreakRecord {
   final int day;
   final int score;
@@ -17,18 +18,27 @@ class PastScoresScreen extends StatefulWidget {
 
 class _PastScoresScreenState extends State<PastScoresScreen> {
   late Future<List<StreakRecord>> _streakFuture;
+  final _scoreRepository = ScoresRepositories();
 
-  // ✅ Replace with your real API call
+  // ✅ Fixed: Return List<StreakRecord>
   Future<List<StreakRecord>> fetchStreaksFromBackend() async {
-    await Future.delayed(const Duration(seconds: 1)); // simulate API delay
-    // Example mock data (this will come from backend)
-    return [
-      StreakRecord(day: 1, score: 10),
-      StreakRecord(day: 2, score: 20),
-      StreakRecord(day: 3, score: 30),
-      StreakRecord(day: 4, score: 40),
-      StreakRecord(day: 5, score: 50),
-    ];
+    try {
+      final scoreData = await _scoreRepository.fetchScore();
+
+      // Expecting {"scores": [ { "score": 80, ... }, ... ]}
+      final scores = scoreData?['scores'] as List<dynamic>? ?? [];
+
+      return List.generate(scores.length, (index) {
+        final scoreEntry = scores[index] as Map<String, dynamic>;
+        return StreakRecord(
+          day: index + 1,
+          score: (scoreEntry["score"] ?? 0) as int,
+        );
+      });
+    } catch (e) {
+      debugPrint("❌ Error fetching scores: $e");
+      return [];
+    }
   }
 
   @override
@@ -41,15 +51,16 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-    backgroundColor: const Color(0xFFF1EEFE),
-    elevation: 0,
-    title: const Text(
-      "Past Scores",
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
+        backgroundColor: const Color(0xFFF1EEFE),
+        elevation: 0,
+        title: const Text(
+          "Past Scores",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
       ),
-    ),),
       backgroundColor: const Color(0xFFF1EEFE),
       body: SafeArea(
         child: FutureBuilder<List<StreakRecord>>(
@@ -64,6 +75,15 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
 
             final streaks = snapshot.data ?? [];
 
+            if (streaks.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No past scores available.",
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              );
+            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -72,7 +92,7 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                 // Rocket Image
                 Center(
                   child: Image.asset(
-                    "assets/rocket.gif", // put your GIF file here
+                    "assets/rocket.gif", // make sure file exists
                     height: 300,
                     fit: BoxFit.contain,
                   ),
@@ -149,7 +169,7 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              "+${streak.score} 🪙",
+                             "${streak.score > 0 ? '+${streak.score}' : streak.score} 🪙",
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,

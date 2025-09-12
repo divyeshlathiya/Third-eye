@@ -1,136 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// for Male
-
-// class WellnessScreen extends StatelessWidget {
-//   WellnessScreen({super.key});
-//   // Define the number of boxes in each column
-//   final List<int> boxCounts = [9, 7, 5, 3];
-
-//   // Generate offset to vertically align each column based on total boxes
-//   List<Widget> buildColumn({
-//     required BuildContext context,
-//     required int columnIndex,
-//     required int boxCount,
-//     required int maxCount,
-//     required Color color,
-//   }) {
-//     final int topOffset = (maxCount - boxCount) ~/ 2;
-
-//     return List.generate(maxCount, (i) {
-//       if (i < topOffset || i >= topOffset + boxCount) {
-//         return const SizedBox(height: 34); // Empty space (same size as box + margin)
-//       }
-//       return Container(
-//         width: 30,
-//         height: 30,
-//         margin: const EdgeInsets.all(2),
-//         decoration: BoxDecoration(
-//           color: color,
-//           borderRadius: BorderRadius.circular(4),
-//         ),
-//       );
-//     });
-//   }
-
-//   void onColumnTap(BuildContext context, int index) {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(builder: (context) => QuizScreen(columnIndex: index)),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     int maxBoxes = boxCounts[0]; // 9
-
-//     final List<Color> colors = [
-//       Colors.purple.shade100,
-//       Colors.deepPurpleAccent,
-//       Colors.deepPurple.shade800,
-//       Colors.black87,
-//     ];
-
-//     return Scaffold(
-//       backgroundColor: Colors.purple.shade50,
-//       appBar: AppBar(
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         leading: const BackButton(color: Colors.black),
-//         title: const Text(
-//           'Start Your Wellness Journey',
-//           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-//         ),
-//       ),
-//       body: Column(
-//         children: [
-//           const Padding(
-//             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-//             child: Text(
-//               'Choose a quiz column below to explore your path to better mental health.',
-//               style: TextStyle(fontSize: 14),
-//             ),
-//           ),
-//           Expanded(
-//             child: Center(
-//               child: Row(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: List.generate(boxCounts.length, (index) {
-//                   return GestureDetector(
-//                     onTap: () => onColumnTap(context, index),
-//                     child: Column(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: buildColumn(
-//                         context: context,
-//                         columnIndex: index,
-//                         boxCount: boxCounts[index],
-//                         maxCount: maxBoxes,
-//                         color: colors[index],
-//                       ),
-//                     ),
-//                   );
-//                 }),
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: ElevatedButton(
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.deepPurple,
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(24),
-//                 ),
-//                 padding: const EdgeInsets.symmetric(vertical: 16),
-//                 minimumSize: const Size.fromHeight(50),
-//               ),
-//               onPressed: () {},
-//               child: const Text('Continue', style: TextStyle(fontSize: 16)),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class QuizScreen extends StatelessWidget {
-//   final int columnIndex;
-
-//   const QuizScreen({super.key, required this.columnIndex});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Quiz for Column ${columnIndex + 1}')),
-//       body: Center(
-//         child: Text('This is screen for column ${columnIndex + 1}.'),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:thirdeye/screen/questions/question1_screen.dart';
 import 'package:thirdeye/screen/questions/question2_screen.dart';
@@ -138,7 +5,8 @@ import 'package:thirdeye/screen/questions/question3_screen.dart';
 import 'package:thirdeye/screen/questions/question4_screen.dart';
 
 class WellnessScreen extends StatefulWidget {
-  const WellnessScreen({super.key});
+  final bool isMale;
+  const WellnessScreen({super.key, required this.isMale});
 
   @override
   State<WellnessScreen> createState() => _WellnessScreenState();
@@ -146,7 +14,7 @@ class WellnessScreen extends StatefulWidget {
 
 class _WellnessScreenState extends State<WellnessScreen> {
   // Box count for each column (left to right)
-  final List<int> boxCounts = [3, 5, 7, 9];
+  late List<int> boxCounts;
 
   // Colors for each column
   final List<Color> colors = [
@@ -184,25 +52,29 @@ class _WellnessScreenState extends State<WellnessScreen> {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Question1Screen()),
+          MaterialPageRoute(
+              builder: (context) => Question1Screen(isMale: widget.isMale)),
         );
         break;
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Question2Screen()),
+          MaterialPageRoute(
+              builder: (context) => Question2Screen(isMale: widget.isMale)),
         );
         break;
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Question3Screen()),
+          MaterialPageRoute(
+              builder: (context) => Question3Screen(isMale: widget.isMale)),
         );
         break;
       case 3:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Question4Screen()),
+          MaterialPageRoute(
+              builder: (context) => Question4Screen(isMale: widget.isMale)),
         );
         break;
       default:
@@ -210,9 +82,20 @@ class _WellnessScreenState extends State<WellnessScreen> {
     }
   }
 
+  void initState() {
+    super.initState();
+
+    // ✅ Choose boxCounts based on condition
+    if (widget.isMale) {
+      boxCounts = [3, 5, 7, 9]; // Male
+    } else {
+      boxCounts = [9, 7, 5, 3]; // Female (or default)
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final int maxBoxes = boxCounts.last; // 9
+    final int maxBoxes = boxCounts.reduce((a, b) => a > b ? a : b); // 9
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Dynamic sizing

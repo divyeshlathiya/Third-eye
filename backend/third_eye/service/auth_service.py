@@ -11,12 +11,12 @@ from ..models.user import User
 from ..schemas.user import CreateUser, ShowUser, LoginUser, UpdateDOBGender, RegisterResponce, UpdateProfile
 from ..schemas.otp import OtpRequest, OtpVerifyRequest
 from ..utils.email_utils import send_otp_email
-from ..utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails
+from ..utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails, reset_verified_emails
 
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
-user_router = APIRouter(prefix="/api/users")
+user_router = APIRouter(prefix="/api/users", tags=["Users"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -56,21 +56,57 @@ def get_current_user(
 
 @router.post("/send-otp")
 async def send_otp(data: OtpRequest, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == data.email).first()
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    if data.purpose == "signup":
+        existing = db.query(User).filter(User.email == data.email).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+
+    elif data.purpose == "reset":
+        existing = db.query(User).filter(User.email == data.email).first()
+        if not existing:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+
     otp = generate_otp()
     save_otp(data.email, otp)
     await send_otp_email(data.email, otp)
+    return {"message": "OTP sent successfully"}
 
 
 @router.post("/verify-otp")
 def verify_email_otp(data: OtpVerifyRequest):
     if verify_otp(data.email, data.otp):
-        verified_emails.add(data.email)
+        if data.purpose == "signup":
+            verified_emails.add(data.email)
+        elif data.purpose == "reset":
+            reset_verified_emails.add(data.email)
         return {"message": "Email verified successfully"}
-    raise HTTPException(status_code=400, detail="Invalid or expired otp")
+    raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
+
+@router.post("/forgot-password/reset")
+def reset_password(
+    email: str = Body(...),
+    new_password: str = Body(...),
+    db: Session = Depends(get_db)
+):
+    if email not in reset_verified_emails:
+        raise HTTPException(
+            status_code=400, detail="OTP not verified for reset")
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.password = hash_password(new_password)
+    db.commit()
+    reset_verified_emails.remove(email)
+    return {"message": "Password reset successful"}
 
 
 @user_router.get("/me")
@@ -88,7 +124,7 @@ def get_profile(current_user: User = Depends(get_current_user)):
     }
 
 
-@user_router.patch("/me/profile/dob-gender", response_model=ShowUser)
+@user_router.post("/me/profile/dob-gender", response_model=ShowUser)
 def update_dob_profile(
     update_data: UpdateDOBGender,
     db: Session = Depends(get_db),
@@ -136,6 +172,13 @@ def update_profile(
 @router.post("/register", response_model=RegisterResponce)
 def register(user: CreateUser, db: Session = Depends(get_db)):
     try:
+
+        if user.email not in verified_emails:
+            raise HTTPException(
+                status_code=400,
+                detail="Email not verified. Please verify OTP first."
+            )
+
         existing = db.query(User).filter(User.email == user.email).first()
         if existing:
             raise HTTPException(
@@ -172,7 +215,17 @@ def register(user: CreateUser, db: Session = Depends(get_db)):
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
 
-    if not user or not verfiy_password(form_data.password, user.password):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if user.provider != "email":
+        # User registered via Google (or other providers)
+        raise HTTPException(
+            status_code=400,
+            detail=f"This account is registered via {user.provider}. Please login using {user.provider} Sign-In."
+        )
+
+    if not verfiy_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     tokens = issue_tokens(user.email)
@@ -182,6 +235,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         "id": user.id,
         "email": user.email,
         "first_name": user.first_name,
+        "gender": user.gender,
         "access_token": tokens["access_token"],
         "refresh_token": tokens["refresh_token"],
         "token_type": "Bearer"

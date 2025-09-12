@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:thirdeye/screen/onboarding_screen.dart';
+import 'package:thirdeye/screen/splash_screen.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 import 'firebase_options.dart'; // if using generated file
 
 void main() async {
@@ -15,26 +16,34 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      debugPrint("Firebase initialized successfully");
+      debugPrint("Firebase initialized.");
     } else {
-      debugPrint("Firebase was already initialized");
+      Firebase.app();
+      debugPrint("Firebase was already initialized.");
     }
   } catch (e) {
     debugPrint("Error initializing Firebase: $e");
   }
 
-  runApp(MyApp());
+  final hasSeenOnboarding = await PrefsHelper.hasSeenOnboarding();
+
+  runApp(MyApp(
+    hasSeenOnboarding: hasSeenOnboarding,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.hasSeenOnboarding});
+  final bool hasSeenOnboarding;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ThirdEye',
       theme: ThemeData(primarySwatch: Colors.purple),
-      home: OnboardingScreen(),
+      home: SplashScreen(
+        hasSeenOnboarding: hasSeenOnboarding,
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

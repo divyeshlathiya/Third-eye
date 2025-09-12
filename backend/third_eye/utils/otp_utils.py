@@ -3,6 +3,7 @@ import time
 
 otp_store = {}  # for development purpose
 verified_emails = set()
+reset_verified_emails = set()
 
 
 def generate_otp(length=6):

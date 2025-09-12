@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:thirdeye/login_screen.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -127,13 +127,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (controller.page!.toInt() < onboardingPages.length - 1) {
                   controller.nextPage(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 } else {
+                  await PrefsHelper.setOnboardingSeen();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

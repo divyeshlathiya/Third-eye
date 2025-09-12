@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:thirdeye/repositories/user_repositories.dart';
+import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -18,6 +18,8 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _profileRepository = ProfileRepository();
   DateTime? _picked;
+  String? _profilePicUrl;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _loadProfile() async {
+    setState(() => isLoading = true);
     final profile = await _profileRepository.fetchProfile();
 
     if (profile != null) {
@@ -64,10 +67,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (profile['dob'] != null && profile['dob'].toString().isNotEmpty) {
           try {
             DateTime parsedDob = DateTime.parse(profile['dob']);
-            _dob.text = formatDobForDisplay(parsedDob); // user-friendly
+            _dob.text = formatDobForDisplay(parsedDob);
           } catch (e) {
             debugPrint("DOB parsing error: $e");
-            _dob.text = profile['dob']; // fallback
+            _dob.text = profile['dob'];
           }
         }
 
@@ -78,15 +81,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           selectedGender = null;
         }
 
-        // if (profile['profile_pic'] != null) {
-        //   _profileImage = File(profile['profile_pic']);
-        //   // ⚠️ If it's a URL from Firebase, use NetworkImage in CircleAvatar
-        // }
+        // ✅ Set profile_pic URL from API response
+        if (profile['profile_pic'] != null &&
+            profile['profile_pic'].toString().isNotEmpty) {
+          _profilePicUrl = profile['profile_pic'];
+        }
       });
     }
+
+    setState(() => isLoading = false);
   }
 
   Future<void> _saveProfile() async {
+    setState(() => isLoading = true);
+
+    if (_firstName.text.trim().isEmpty ||
+        _lastName.text.trim().isEmpty ||
+        _dob.text.trim().isEmpty ||
+        selectedGender == null ||
+        selectedGender!.isEmpty) {
+      setState(() => isLoading = false);
+      CustomSnackBar.showCustomSnackBar(context, "Please fill all fields");
+      return;
+    }
+
     final updatedData = {
       "first_name": _firstName.text.trim(),
       "last_name": _lastName.text.trim(),
@@ -95,9 +113,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     };
 
     final result = await _profileRepository.updateProfile(updatedData);
+    await StorageHelper.saveToken("first_name", _firstName.text);
+
+    if (!mounted) return;
+
+    setState(() => isLoading = false);
 
     if (result != null) {
-      if (!mounted) return;
       CustomSnackBar.showCustomSnackBar(
           context, "Profile updated successfully.");
       Navigator.pop(context);
@@ -136,7 +158,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(width: 8),
               Text(
                 gender,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.deepPurple,
                   fontWeight: FontWeight.w500,
                 ),
@@ -155,6 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (pickedFile != null) {
       setState(() {
         _profileImage = File(pickedFile.path);
+        isLoading = true;
       });
 
       // Upload to Firebase
@@ -162,20 +185,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String? url = await uploadProfilePic(_profileImage!, userId);
       if (url != null) {
         debugPrint("Uploaded! Download URL: $url");
+        setState(() {
+          _profilePicUrl = url; // ✅ update CircleAvatar immediately
+        });
       }
+      setState(() => isLoading = false);
     }
   }
 
   Future<String?> uploadProfilePic(File imageFile, String userId) async {
     try {
-      // Create a reference with userId (unique folder per user)
       final storageRef =
           FirebaseStorage.instance.ref().child("profile_pics/$userId.jpg");
 
-      // Upload the file
       await storageRef.putFile(imageFile);
-
-      // Get the download URL
       String downloadUrl = await storageRef.getDownloadURL();
       return downloadUrl;
     } catch (e) {
@@ -198,187 +221,233 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: _profileImage != null
-                        ? FileImage(_profileImage!)
-                        : const AssetImage('agna.png') as ImageProvider,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple,
-                        borderRadius: BorderRadius.circular(20),
+      body: Stack(children: [
+        RefreshIndicator(
+          onRefresh: _loadProfile, // ✅ pull-to-refresh
+          child: SingleChildScrollView(
+            physics:
+                const AlwaysScrollableScrollPhysics(), // needed for RefreshIndicator
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _profileImage != null
+                            ? FileImage(_profileImage!)
+                            : (_profilePicUrl != null
+                                ? NetworkImage(_profilePicUrl!)
+                                : null) as ImageProvider<Object>?,
+                        child: (_profileImage == null && _profilePicUrl == null)
+                            ? const Icon(Icons.person,
+                                size: 50, color: Colors.grey)
+                            : null,
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.white),
-                        onPressed: _pickImageAndUpload,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.white),
+                            onPressed: _pickImageAndUpload,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                // First + Last Name
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'First Name',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _firstName,
+                            decoration: InputDecoration(
+                              hintText: 'Enter first name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Last Name',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _lastName,
+                            decoration: InputDecoration(
+                              hintText: 'Enter last name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Email
+                const Text(
+                  'Email',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  readOnly: true,
+                  controller: _email,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // DOB
+                const Text(
+                  'Date of Birth',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _dob,
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
+                  decoration: InputDecoration(
+                    hintText: 'Select date',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    suffixIcon: const Icon(Icons.calendar_today),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Gender
+                const Text(
+                  'Gender',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _genderButton("FEMALE", "assets/female.svg"),
+                    const SizedBox(width: 12),
+                    _genderButton("MALE", "assets/male.svg"),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Save Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3E2C96),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            // First Name and Last Name in Row
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'First Name',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _firstName,
-                        decoration: InputDecoration(
-                          hintText: 'Enter first name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Last Name',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _lastName,
-                        decoration: InputDecoration(
-                          hintText: 'Enter last name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-
-            // Email
-            const Text(
-              'Email',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              readOnly: true,
-              controller: _email,
-              decoration: InputDecoration(
-                hintText: 'Enter your email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Date of Birth
-            const Text(
-              'Date of Birth',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _dob,
-              readOnly: true,
-              onTap: () => _selectDate(context),
-              decoration: InputDecoration(
-                hintText: 'Select date',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                suffixIcon: const Icon(Icons.calendar_today),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Gender
-            const Text(
-              'Gender',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _genderButton("FEMALE", "icons/female.svg"),
-                const SizedBox(width: 12),
-                _genderButton("MALE", "icons/male.svg"),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Save Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3E2C96),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        if (isLoading)
+          Container(
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator(color: Colors.deepPurple),
+            ),
+          ),
+      ]),
     );
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    DateTime initialDate;
+
+    // If user already has a DOB in the text field → use that
+    if (_dob.text.isNotEmpty) {
+      try {
+        // Your text is in format: dd/MM/yyyy
+        List<String> parts = _dob.text.split('/');
+        if (parts.length == 3) {
+          initialDate = DateTime(
+            int.parse(parts[2]), // year
+            int.parse(parts[1]), // month
+            int.parse(parts[0]), // day
+          );
+        } else {
+          initialDate = DateTime(2000, 1, 1);
+        }
+      } catch (e) {
+        debugPrint("Error parsing DOB for date picker: $e");
+        initialDate = DateTime(2000, 1, 1);
+      }
+    } else {
+      // Default if no DOB set
+      initialDate = DateTime(2000, 1, 1);
+    }
+
     _picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2005, 6, 19),
+      initialDate: initialDate,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
+
     if (_picked != null) {
       setState(() {
-        _dob.text =
-            "${_picked?.year}-${_picked?.month.toString().padLeft(2, '0')}-${_picked?.day.toString().padLeft(2, '0')}";
+        _dob.text = formatDobForDisplay(_picked!); // ✅ display as dd/MM/yyyy
       });
     }
   }

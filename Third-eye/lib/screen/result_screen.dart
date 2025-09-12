@@ -125,7 +125,7 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.20),
               MyButton(
-                buttonLabel: "Next",
+                child: Text("Next"),
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thirdeye/repositories/google_auth_repository.dart';
+import 'package:thirdeye/screen/about_yourself.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/loginform.dart';
 import 'package:thirdeye/services/google_auth_service.dart';
@@ -35,6 +36,37 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // void _googleLogin() async {
+  //   final repo = GoogleAuthRepository(GoogleAuthService());
+
+  //   final userData = await repo.signInWithGoogle();
+  //   print(userData.toString());
+
+  //   if (userData != null) {
+  //     await StorageHelper.saveToken("first_name", userData['first_name'] ?? "");
+  //     await StorageHelper.saveToken("access_token", userData["access_token"]);
+
+  //     String accessToken = userData["access_token"];
+
+  //     final firstName = userData['first_name'] ?? "User";
+  //     // debugPrint("***** Welcome! $firstName ******");
+
+  //     CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
+  //         backgroundColor: Colors.purple);
+  //     if (!mounted) return;
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //           builder: (context) => AboutYourSelfScreen(
+  //                 accessToken: accessToken,
+  //               )),
+  //     );
+  //   } else {
+  //     CustomSnackBar.showCustomSnackBar(context, "Google Sign-In failed",
+  //         backgroundColor: Colors.red);
+  //   }
+  // }
+
   void _googleLogin() async {
     final repo = GoogleAuthRepository(GoogleAuthService());
 
@@ -43,20 +75,47 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (userData != null) {
       await StorageHelper.saveToken("first_name", userData['first_name'] ?? "");
+      await StorageHelper.saveToken("access_token", userData["access_token"]);
 
+      String accessToken = userData["access_token"];
       final firstName = userData['first_name'] ?? "User";
-      // debugPrint("***** Welcome! $firstName ******");
 
-      CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
-          backgroundColor: Colors.purple);
+      if (!mounted) return;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardScreen()),
-      );
+      // Check if dob or gender is null
+      final dob = userData['dob'];
+      final gender = userData['gender'];
+
+      if (dob == null || gender == null) {
+        // Redirect to AboutYourSelfScreen to fill missing info
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AboutYourSelfScreen(
+              accessToken: accessToken,
+            ),
+          ),
+        );
+      } else {
+        // Redirect to DashboardScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+        );
+        CustomSnackBar.showCustomSnackBar(
+          context,
+          "Welcome $firstName",
+          backgroundColor: Colors.purple,
+        );
+      }
     } else {
-      CustomSnackBar.showCustomSnackBar(context, "Google Sign-In failed",
-          backgroundColor: Colors.red);
+      CustomSnackBar.showCustomSnackBar(
+        context,
+        "Google Sign-In failed",
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -77,7 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // ✅ Centered illustration and buttons
+          // ✅ Centered illustration and buttonscls
+          
           Column(
             children: [
               const SizedBox(height: 150),

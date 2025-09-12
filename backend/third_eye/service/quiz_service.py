@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 from datetime import timedelta, datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -8,12 +9,8 @@ from ..schemas.quiz_score import QuizScoreRequest
 from ..service.auth_service import get_current_user
 from ..models.user_streak import UserStreak
 
-router = APIRouter(prefix="/api/quiz", tags=["quiz"])
+router = APIRouter(prefix="/api/quiz", tags=["Quiz"])
 
-
-from datetime import datetime, timezone, timedelta
-from sqlalchemy.orm import Session
-from ..models.quiz_score import QuizScore
 
 def can_take_quiz(db: Session, user_id: str) -> bool:
     last_quiz = (
@@ -33,11 +30,10 @@ def can_take_quiz(db: Session, user_id: str) -> bool:
 
     now = datetime.now(timezone.utc)
 
-    if now - last_taken < timedelta(hours=24):
+    if now - last_taken < timedelta(minutes=5):
         return False
 
     return True
-
 
 
 def update_streak(db: Session, user_id: str) -> UserStreak:

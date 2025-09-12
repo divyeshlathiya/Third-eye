@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:thirdeye/screen/dashboard/dashboard.dart';
+import 'package:thirdeye/repositories/profile_repositories.dart';
+import 'package:thirdeye/screen/verified_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
+import 'package:thirdeye/sharable_widget/snack_bar.dart';
 
 class AboutYourSelfScreen extends StatefulWidget {
-  const AboutYourSelfScreen({super.key});
+  final String? accessToken;
+  const AboutYourSelfScreen({super.key, required this.accessToken});
 
   @override
   State<AboutYourSelfScreen> createState() => _AboutYourSelfScreenState();
@@ -15,6 +18,38 @@ class AboutYourSelfScreen extends StatefulWidget {
 class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
   DateTime? selectedDate;
   String? selectedGender;
+  bool isLoading = false;
+
+  Future<void> _submitProfile() async {
+    if (selectedDate == null || selectedGender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select DOB and Gender")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final profileRepo = ProfileRepository();
+    final dob = DateFormat("yyyy-MM-dd").format(selectedDate!);
+    final gender = selectedGender!;
+
+    final response =
+        await profileRepo.updateDobGender(widget.accessToken, dob, gender);
+
+    // print("🔑 Access Token from storage: ${widget.accessToken}");
+
+    setState(() => isLoading = false);
+
+    if (response != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const VerifiedScreen()),
+      );
+    } else {
+      CustomSnackBar.showCustomSnackBar(context, "Failed to update profile");
+    }
+  }
 
   Future<void> _pickDate() async {
     DateTime? picked = await showDatePicker(
@@ -149,21 +184,28 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  _genderButton("Female", "assets/icons/female.svg"),
+                  _genderButton("FEMALE", "assets/female.svg"),
                   const SizedBox(width: 12),
-                  _genderButton("Male", "assets/icons/male.svg"),
+                  _genderButton("MALE", "assets/male.svg"),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.40),
               MyButton(
-                  buttonLabel: "Next",
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DashboardScreen(),
-                        ));
-                  })
+                onPressed: isLoading ? null : _submitProfile,
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        "Next",
+                        style: TextStyle(color: Colors.white),
+                      ),
+              )
             ],
           ),
         ),
