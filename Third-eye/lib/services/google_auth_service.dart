@@ -58,6 +58,7 @@ class GoogleAuthService {
     try {
       // if any error happen when sign in then first of all clear cache (last email id selected)
       if (forceAccountSelection) {
+        await _googleSignIn.disconnect();
         await _googleSignIn.signOut(); // clears cache
         await _auth.signOut();
       }
