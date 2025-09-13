@@ -22,10 +22,10 @@ class _Question1ScreenState extends State<Question1Screen> {
       "assets/q1-10.jpg",
       "assets/agna.png",
       "assets/agna.png",
+      "assets/q1-0.png",
       "assets/agna.png",
       "assets/agna.png",
-      "assets/agna.png",
-      "assets/q1-neg10.jpg",
+      "assets/q1-neg10.png",
       "assets/agna.png",
     ];
 

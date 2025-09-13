@@ -16,15 +16,15 @@ class _Question4ScreenState extends State<Question4Screen> {
   @override
   Widget build(BuildContext context) {
     final maleImages = [
-      "assets/agna.png",
-      "assets/q1-10.jpg",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/q1-neg10.jpg",
-      "assets/agna.png",
+      "assets/q4-40.jpg",
+      "assets/q4-30.png",
+      "assets/q4-20.png",
+      "assets/q4-10.png",
+      "assets/q4-0.png",
+      "assets/q4-neg10.png",
+      "assets/q4-neg20.png",
+      "assets/q4-neg30.png",
+      "assets/q4-neg40.png",
     ];
 
     final maleTips = [

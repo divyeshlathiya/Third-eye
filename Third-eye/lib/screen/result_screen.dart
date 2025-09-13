@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thirdeye/screen/tips_screen.dart';
+import 'package:thirdeye/screen/scoreboard_screen.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -130,7 +130,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TipsScreen(),
+                      builder: (context) => ScoreBoardScreen(),
                     ),
                   );
                 },

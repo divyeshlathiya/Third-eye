@@ -150,7 +150,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   //   _navigateTo(context, const TermsScreen());
                   // }),
                   _buildMenuItem(Icons.description, "Terms & Conditions", () {
-                    _navigateTo(context, const ScoreBoardScreen());
+                    _navigateTo(context, const TermsScreen());
                   }),
                   const SizedBox(height: 20),
                   _buildMenuItem(Icons.info, "About Us", () {

@@ -17,15 +17,15 @@ class _Question3ScreenState extends State<Question3Screen> {
   @override
   Widget build(BuildContext context) {
     final maleImages = [
+      "assets/q3-30.png",
+      "assets/q3-20.png",
+      "assets/q3-10.png",
       "assets/agna.png",
-      "assets/q1-10.jpg",
+      "assets/q3-0.png",
       "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/agna.png",
-      "assets/q1-neg10.jpg",
-      "assets/agna.png",
+      "assets/q3-neg10.png",
+      "assets/q3-neg20.png",
+      "assets/q3-neg30.png",
     ];
 
     final maleTips = [
@@ -80,7 +80,8 @@ class _Question3ScreenState extends State<Question3Screen> {
               builder: (_) => Question4Screen(isMale: widget.isMale)),
         );
       },
-      onPrevious: () => Navigator.pop(context),isMale: widget.isMale,
+      onPrevious: () => Navigator.pop(context),
+      isMale: widget.isMale,
     );
   }
 }
