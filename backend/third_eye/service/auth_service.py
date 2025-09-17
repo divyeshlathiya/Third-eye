@@ -5,6 +5,8 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
+from third_eye.schemas.token import RefreshTokenRequest
+
 from ..auth.jwt import issue_tokens, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS, create_access_token, create_refresh_token, decode_access_token, hash_password, verfiy_password, ALGORITHM, SECRET_KEY
 from ..database.database import get_db
 from ..models.user import User
@@ -18,7 +20,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 user_router = APIRouter(prefix="/api/users", tags=["Users"])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 @router.get("/health")
@@ -243,7 +245,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 @router.post("/refreshToken")
-def refresh_token(refresh_token: str = Body(...), db: Session = Depends(get_db)):
+def refresh_token(refresh_token: RefreshTokenRequest, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")

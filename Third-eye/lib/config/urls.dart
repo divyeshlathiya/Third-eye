@@ -1,8 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ConfigURL {
-  static String get base => "http://192.168.1.73:8000/api";
-  // static String get base => dotenv.env["BASE_URL"] ?? "";
+  // static String get base => "http://192.168.1.73:8000/api";
+  static String get base => dotenv.env["BASE_URL"] ?? "";
   static String get loginURL => "$base/auth/login";
   static String get signUpURL => "$base/auth/register";
   static String get sendOtpURL => "$base/auth/send-otp";
@@ -15,4 +15,5 @@ class ConfigURL {
   static String get resetPassword => "$base/auth/forgot-password/reset";
   static String get updatescore => "$base/quiz/add-score";
   static String get getscore => "$base/quiz/my-scores";
+  static String get getCertificate => "$base/auth/certificate";
 }

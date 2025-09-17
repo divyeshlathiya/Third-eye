@@ -1,7 +1,86 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:thirdeye/repositories/certificate_repository.dart';
+import 'package:thirdeye/sharable_widget/snack_bar.dart';
 
-class CertificateScreen extends StatelessWidget {
+class CertificateScreen extends StatefulWidget {
   const CertificateScreen({super.key});
+
+  @override
+  State<CertificateScreen> createState() => _CertificateScreenState();
+}
+
+class _CertificateScreenState extends State<CertificateScreen> {
+  final CertificateRepository _repository = CertificateRepository();
+
+  Uint8List? _certificateBytes;
+  bool _loading = false;
+  File? _localFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCertificateFromLocal();
+  }
+
+  Future<File> _getLocalFile() async {
+    final dir = await getApplicationDocumentsDirectory(); 
+    return File("${dir.path}/certificate.png");
+  }
+
+  Future<void> _loadCertificateFromLocal() async {
+    final file = await _getLocalFile();
+    if (await file.exists()) {
+      final bytes = await file.readAsBytes();
+      setState(() {
+        _certificateBytes = bytes;
+        _localFile = file;
+      });
+    } else {
+      // If not found locally, auto-fetch once
+      _downloadCertificate();
+    }
+  }
+
+  Future<void> _downloadCertificate() async {
+    setState(() => _loading = true);
+
+    final bytes = await _repository.getCertificate();
+    if (bytes != null) {
+      final file = await _getLocalFile();
+      await file.writeAsBytes(bytes); // Save permanently
+
+      setState(() {
+        _certificateBytes = bytes;
+        _localFile = file;
+      });
+
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(
+          context, "Certificate downloaded & saved locally");
+    } else {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Failed to fetch certificate");
+    }
+
+    setState(() => _loading = false);
+  }
+
+  Future<void> _shareCertificate() async {
+    if (_localFile == null || !await _localFile!.exists()) {
+      CustomSnackBar.showCustomSnackBar(
+          context, "Please download certificate first");
+      return;
+    }
+
+    await Share.shareXFiles(
+      [XFile(_localFile!.path)],
+      text: "Here is my certificate 🎉",
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +91,7 @@ class CertificateScreen extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 0,
         title: const Text(
-          "Menu",
+          "Certificate",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -22,14 +101,16 @@ class CertificateScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 16),
-            // Certificate Image
+            // Certificate Preview
             Container(
               width: double.infinity,
               height: 525,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("Certificate.png"),
-                  fit: BoxFit.cover, // optional: scales image properly
+                  image: _certificateBytes != null
+                      ? MemoryImage(_certificateBytes!)
+                      : const AssetImage("assets/Certificate.png") as ImageProvider,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -46,9 +127,7 @@ class CertificateScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: () {
-                      // TODO: Share logic
-                    },
+                    onPressed: _shareCertificate,
                     icon: const Icon(Icons.share),
                     label: const Text("Share"),
                   ),
@@ -64,10 +143,17 @@ class CertificateScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: () {
-                      // TODO: Download logic
-                    },
-                    icon: const Icon(Icons.download),
+                    onPressed: _loading ? null : _downloadCertificate,
+                    icon: _loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.download),
                     label: const Text("Download"),
                   ),
                 ),

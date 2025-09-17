@@ -1,7 +1,135 @@
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:thirdeye/login_screen.dart';
+// import 'package:thirdeye/screen/about_yourself.dart';
+// import 'package:thirdeye/screen/dashboard/dashboard.dart';
+// import 'package:thirdeye/screen/onboarding_screen.dart';
+// import 'package:thirdeye/services/auth_manager.dart';
+// import 'package:thirdeye/utils/storage_helper.dart';
+
+// class SplashScreen extends StatefulWidget {
+//   final bool hasSeenOnboarding;
+//   const SplashScreen({super.key, required this.hasSeenOnboarding});
+
+//   @override
+//   State<SplashScreen> createState() => _SplashScreenState();
+// }
+
+// class _SplashScreenState extends State<SplashScreen>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController _controller;
+//   late Animation<double> _fadeIn;
+//   final AuthManager _authManager = AuthManager();
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     // Animation for app name fade-in
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: const Duration(seconds: 2),
+//     );
+//     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+//     _controller.forward();
+
+//     // Check session after a short delay (to let animation show)
+//     Future.delayed(const Duration(seconds: 5), () async {
+//       if (widget.hasSeenOnboarding) {
+//         await _checkSession(); // this will handle navigation
+//       } else {
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+//         );
+//       }
+//     });
+//   }
+
+//   @override
+//   void dispose() {
+//     _controller.dispose();
+//     super.dispose();
+//   }
+
+//   Future<void> _checkSession() async {
+//     final profile = await _authManager.initSession();
+//     print("******* Profile ${profile} *******");
+
+//     if (!mounted) return;
+
+//     if (profile != null) {
+//       // If profile exists, check dob & gender
+//       final dob = profile['dob'];
+//       final gender = profile['gender'];
+
+//       print("****** Profile access token: ${profile["access_token"]} ******");
+
+//       if (dob == null || gender == null) {
+//         final accessToken = await StorageHelper.getToken("access_token");
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(
+//               builder: (_) => AboutYourSelfScreen(accessToken: accessToken)),
+//         );
+//       } else {
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (_) => const DashboardScreen()),
+//         );
+//       }
+//     } else {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (_) => const LoginScreen()),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: const Color(0xFF271779),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             // Logo (already shown in native splash, but we can repeat for smooth transition)
+
+//             // SvgPicture.asset("Logo.svg"),
+
+//             Image.asset("assets/Logo.jpg"),
+
+//             const SizedBox(height: 20),
+
+//             // Animated App Name
+//             FadeTransition(
+//               opacity: _fadeIn,
+//               child: const Text(
+//                 "THIRD EYE",
+//                 style: TextStyle(
+//                   fontSize: 28,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.white,
+//                   letterSpacing: 1.5,
+//                 ),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:thirdeye/login_screen.dart';
+import 'package:thirdeye/screen/about_yourself.dart';
+import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/screen/onboarding_screen.dart';
+import 'package:thirdeye/services/auth_manager.dart';
+import 'package:thirdeye/utils/storage_helper.dart';
 
 class SplashScreen extends StatefulWidget {
   final bool hasSeenOnboarding;
@@ -15,34 +143,60 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeIn;
+  final AuthManager _authManager = AuthManager();
 
   @override
   void initState() {
     super.initState();
 
-    // Animation for app name fade-in
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
-
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    // Navigate after animation
-    Timer(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (widget.hasSeenOnboarding) {
+        await _checkSession();
+      } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        );
+      }
+    });
+  }
+
+  Future<void> _checkSession() async {
+    final profile = await _authManager.initSession();
+
+    if (!mounted) return;
+
+    if (profile != null) {
+      final dob = profile['dob'];
+      final gender = profile['gender'];
+      final accessToken = await StorageHelper.getToken("access_token");
+
+      if (dob == null || gender == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AboutYourSelfScreen(accessToken: accessToken!),
+          ),
         );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );
       }
-    });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
   }
 
   @override
@@ -59,15 +213,8 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo (already shown in native splash, but we can repeat for smooth transition)
-
-            // SvgPicture.asset("Logo.svg"),
-
             Image.asset("assets/Logo.jpg"),
-
             const SizedBox(height: 20),
-
-            // Animated App Name
             FadeTransition(
               opacity: _fadeIn,
               child: const Text(
@@ -86,3 +233,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+

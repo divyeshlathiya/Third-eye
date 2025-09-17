@@ -109,31 +109,3 @@ def get_my_scores(
         "current_streak": streak.current_streak if streak else 0,
         "longest_streak": streak.longest_streak if streak else 0
     }
-
-
-# # Add quiz score
-# @router.post("/add-score")
-# def add_score(
-#     score_data: QuizScoreRequest,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user)
-# ):
-#     quiz_score = QuizScore(
-#         user_id=current_user.id,
-#         quiz_name=score_data.quiz_name,
-#         score=score_data.score,
-#     )
-#     db.add(quiz_score)
-#     db.commit()
-#     db.refresh(quiz_score)
-
-#     return {"status": "success", "quiz_score_id": str(quiz_score.id)}
-
-# # Get all scores for logged-in user
-# @router.get("/my-scores")
-# def get_my_scores(
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user)
-# ):
-#     scores = db.query(QuizScore).filter(QuizScore.user_id == current_user.id).all()
-#     return {"email": current_user.email, "scores": scores}

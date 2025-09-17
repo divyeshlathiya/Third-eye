@@ -9,7 +9,6 @@ import 'package:thirdeye/repositories/auth_repositories.dart';
 import 'package:thirdeye/repositories/google_auth_repository.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/login_screen.dart';
-import 'package:thirdeye/services/google_auth_service.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 
 class MenuDrawer extends StatefulWidget {
@@ -221,7 +220,7 @@ void _logout(BuildContext context) async {
   AuthRepository repo = AuthRepository();
   repo.logout();
 
-  GoogleAuthRepository googleRepo = GoogleAuthRepository(GoogleAuthService());
+  GoogleAuthRepository googleRepo = GoogleAuthRepository();
   await googleRepo.signOut();
 
   Navigator.pushAndRemoveUntil(
