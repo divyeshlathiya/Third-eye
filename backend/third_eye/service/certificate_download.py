@@ -1,6 +1,7 @@
 import io
+import os
 import requests
-from fastapi import Depends, HTTPException, Query, APIRouter
+from fastapi import Depends, HTTPException, APIRouter
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from PIL import Image, ImageDraw, ImageFont, UnidentifiedImageError
@@ -43,14 +44,23 @@ def generate_certificate(template_path, profile_url, name, output_path):
             raise HTTPException(
                 status_code=400, detail="Failed to load user profile picture")
 
-    # Add name
+    # Add name text
     try:
         draw = ImageDraw.Draw(cert_template)
-        font = ImageFont.truetype("arial.ttf", 60)
+
+        # Use bundled font (relative path inside your project)
+        font_path = os.path.join("third_eye", "fonts", "arial.ttf")
+        if not os.path.exists(font_path):
+            raise HTTPException(
+                status_code=500, detail="Font file missing in server deployment"
+            )
+
+        font = ImageFont.truetype(font_path, 60)
         draw.text((700, 1080), name, fill="white", font=font, anchor="mm")
-    except OSError:
+    except OSError as e:
         raise HTTPException(
-            status_code=500, detail="Font file not found or invalid")
+            status_code=500, detail=f"Font file not found or invalid: {str(e)}"
+        )
 
     try:
         # Save certificate
@@ -64,26 +74,22 @@ def generate_certificate(template_path, profile_url, name, output_path):
 
 @router.get("/certificate")
 def get_certificate(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    try:
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-        name = f"{user.first_name} {user.last_name}"
+    name = f"{user.first_name} {user.last_name}"
 
-        # Paths
-        template_path = "third_eye/Certificate_temp.png"
-        output_path = f"third_eye/{user.id}_certificate.png"
+    # Paths
+    template_path = "third_eye/Certificate_temp.png"
+    output_path = f"third_eye/{user.id}_certificate.png"
 
-        # Generate certificate
-        output_file = generate_certificate(
-            template_path, user.profile_pic, name, output_path)
+    # Generate certificate
+    output_file = generate_certificate(
+        template_path, user.profile_pic, name, output_path)
 
-        # Return downloadable file
-        return FileResponse(output_file, media_type="image/png", filename="certificate.png")
-    except Exception as e:
-        # Catch any unexpected error
-        raise HTTPException(
-            status_code=500, detail=f"Unexpected error: {str(e)}")
+    # Return downloadable file
+    return FileResponse(output_file, media_type="image/png", filename="certificate.png")
+
 
 
 # @router.get("/certificate")
