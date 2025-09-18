@@ -245,9 +245,10 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 @router.post("/refreshToken")
-def refresh_token(refresh_token: RefreshTokenRequest, db: Session = Depends(get_db)):
+def refresh_token(req: RefreshTokenRequest, db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(req.refresh_token, SECRET_KEY,
+                             algorithms=[ALGORITHM])
         email = payload.get("sub")
         if email is None:
             raise HTTPException(
