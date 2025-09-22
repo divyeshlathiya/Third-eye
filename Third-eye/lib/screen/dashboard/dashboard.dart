@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/Menu/menu.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/repositories/scores_repositories.dart';
 import 'package:thirdeye/screen/play_quiz_screen.dart';
-import 'package:thirdeye/sharable_widget/index.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
-import 'package:thirdeye/config/app_theme.dart';
+
+import '../../Menu/past_score.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -19,6 +18,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final _scoreRepository = ScoresRepositories();
   final _profileRepository = ProfileRepository();
+
   String? firstName;
   String? profilePicUrl;
   int? latestScore;
@@ -27,32 +27,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isLoading = true;
   String? gender;
 
+  // quiz availability variables
+  DateTime? lastQuizDate;
+  bool isQuizAvailable = true;
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
-  }
-
-  Future<bool> _hasGivenQuizToday() async {
-    try {
-      final scoreData = await _scoreRepository.fetchScore();
-      final scores = scoreData?['scores'] as List<dynamic>? ?? [];
-
-      if (scores.isEmpty) return false;
-
-      final today = DateTime.now();
-      return scores.any((score) {
-        final dateStr =
-            score["date"]; // Make sure your API returns date as string
-        final scoreDate = DateTime.parse(dateStr);
-        return scoreDate.year == today.year &&
-            scoreDate.month == today.month &&
-            scoreDate.day == today.day;
-      });
-    } catch (e) {
-      debugPrint("❌ Error checking today's quiz: $e");
-      return false;
-    }
+    _checkQuizAvailability();
   }
 
   Future<void> _loadUserData() async {
@@ -63,11 +46,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final name = await StorageHelper.getToken('first_name');
       final pic = await StorageHelper.getToken('profile_pic');
       final profile = await _profileRepository.fetchProfile();
+
       // Load scores
       final scoreData = await _scoreRepository.fetchScore();
       final scores = scoreData?['scores'] as List<dynamic>? ?? [];
       final past =
-          scores.fold<int>(0, (sum, item) => sum + (item["score"] as int));
+      scores.fold<int>(0, (sum, item) => sum + (item["score"] as int));
       final latest = scores.isNotEmpty ? scores.last : null;
       final streak = scoreData?["current_streak"] as int?;
 
@@ -86,8 +70,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<void> _checkQuizAvailability() async {
+    final savedDate = await StorageHelper.getToken('last_quiz_date');
+
+    if (savedDate != null) {
+      final parsedDate = DateTime.tryParse(savedDate);
+      if (parsedDate != null) {
+        final today = DateTime.now();
+        final isSameDay = parsedDate.year == today.year &&
+            parsedDate.month == today.month &&
+            parsedDate.day == today.day;
+
+        setState(() {
+          isQuizAvailable = !isSameDay;
+          lastQuizDate = parsedDate;
+        });
+      }
+    }
+  }
+
   String _getGreeting() {
-    final hour = DateTime.now().hour;
+    final hour = DateTime
+        .now()
+        .hour;
     if (hour < 12) return "Good morning";
     if (hour < 17) return "Good afternoon";
     return "Good evening";
@@ -95,15 +100,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Colors.white,
       body: RefreshIndicator(
-        onRefresh: _loadUserData,
+        onRefresh: () async {
+          await _loadUserData();
+          await _checkQuizAvailability();
+        },
         child: Column(
-          // <-- instead of SingleChildScrollView directly
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -125,13 +138,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         child: ClipOval(
                           child: profilePicUrl != null &&
-                                  profilePicUrl!.isNotEmpty
+                              profilePicUrl!.isNotEmpty
                               ? Image.network(
-                                  profilePicUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.person, size: width * 0.07),
-                                )
+                            profilePicUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.person, size: width * 0.07),
+                          )
                               : Icon(Icons.person, size: width * 0.07),
                         ),
                       ),
@@ -148,24 +161,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           isLoading
                               ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                )
+                            height: 16,
+                            width: 16,
+                            child:
+                            CircularProgressIndicator(strokeWidth: 2),
+                          )
                               : Text(
-                                  firstName ?? "User",
-                                  style: TextStyle(
-                                    fontSize: width * 0.04,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
+                            firstName ?? "User",
+                            style: TextStyle(
+                              fontSize: width * 0.04,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
                         ],
                       ),
                       const Spacer(),
                       IconButton(
-                          onPressed: _loadUserData,
+                          onPressed: () {
+                            _loadUserData();
+                            _checkQuizAvailability();
+                          },
                           icon: Icon(Icons.refresh_outlined)),
                       IconButton(
                         onPressed: () {
@@ -191,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       "assets/Card.svg",
                       fit: BoxFit.fitWidth,
                       width: double.infinity,
-                      height: height * 0.12, // responsive height
+                      height: height * 0.12,
                     ),
                   ),
                 ),
@@ -214,8 +230,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(width * 0.05),
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween, // spread content evenly
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(height: 16),
                       RichText(
@@ -231,13 +246,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             TextSpan(
                               text: "21-Days",
                               style: const TextStyle(
-                                color: Color(0xFFad9dff), // 👈 highlight color
+                                color: Color(0xFFad9dff),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const TextSpan(
                                 text:
-                                    " journey to\nBoost mental clarity & Emotional wellness."),
+                                " journey to\nBoost mental clarity & Emotional wellness."),
                           ],
                         ),
                       ),
@@ -246,7 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         children: [
                           Image.asset("assets/agna.png"),
                           Text(
-                            "$streakCount/21",
+                            "${streakCount ?? 0}/21",
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -259,35 +274,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: isQuizAvailable
+                                ? Colors.white
+                                : Colors.grey.shade400,
                             padding: EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          onPressed: () async {
-                            bool alreadyGiven = await _hasGivenQuizToday();
-                            if (alreadyGiven) {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        "You have already given the quiz today")),
-                              );
-                              return; // stop further navigation
-                            }
+                          onPressed: isQuizAvailable
+                              ? () async {
+                            final today = DateTime.now();
+                            await StorageHelper.saveToken('last_quiz_date',
+                                today.toIso8601String());
+
+                            setState(() {
+                              isQuizAvailable = false;
+                              lastQuizDate = today;
+                            });
 
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => WellnessScreen(
-                                  isMale: gender!.toLowerCase() == "male",
-                                ),
-                              ),
+                                  builder: (context) =>
+                                      WellnessScreen(
+                                          isMale:
+                                          gender!.toLowerCase() == "male")),
                             );
-                          },
+                          }
+                              : null,
                           child: Text(
-                            "Start Quiz",
+                            isQuizAvailable
+                                ? "Start Quiz"
+                                : "Come back tomorrow",
                             style: TextStyle(
                               color: const Color(0xFF4B1FA1),
                               fontSize: width * 0.045,
@@ -313,8 +332,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               title: "View Past Score",
                               value: pastScore?.toString() ?? "--",
                               icon: Icons.history,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PastScoresScreen(),
+                                  ),
+                                );
+                              },
                             ),
                           ),
+
                         ],
                       ),
                       SizedBox(height: 16),
@@ -329,48 +357,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildScoreCard(BuildContext context,
-      {required String title, required String value, required IconData icon}) {
-    final width = MediaQuery.of(context).size.width;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      padding: EdgeInsets.all(width * 0.04),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value,
+  Widget _buildScoreCard(BuildContext context, {
+    required String title,
+    required String value,
+    required IconData icon,
+    VoidCallback? onTap, // 👈 added
+  }) {
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    return GestureDetector(
+      onTap: onTap, // 👈 handle tap
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: EdgeInsets.all(width * 0.04),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: width * 0.08,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF4B1FA1),
+                  ),
+                ),
+                SizedBox(width: width * 0.02),
+                Icon(icon, color: const Color(0xFF4B1FA1), size: width * 0.09),
+              ],
+            ),
+            const SizedBox(height: 8),
+            FittedBox(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: width * 0.08,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4B1FA1),
+                  fontSize: width * 0.045,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF4B1FA1).withOpacity(0.7),
                 ),
               ),
-              SizedBox(width: width * 0.02),
-              Icon(icon, color: const Color(0xFF4B1FA1), size: width * 0.09),
-            ],
-          ),
-          SizedBox(height: 8),
-          FittedBox(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: width * 0.045,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF4B1FA1).withOpacity(0.7),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
