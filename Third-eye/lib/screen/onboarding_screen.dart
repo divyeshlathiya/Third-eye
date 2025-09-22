@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/login_screen.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
+import 'package:thirdeye/config/app_theme.dart';
+import 'package:thirdeye/sharable_widget/enhanced_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,6 +16,19 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final controller = PageController();
+  int currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      if (controller.page != null) {
+        setState(() {
+          currentPage = controller.page!.round();
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -23,26 +39,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final onboardingPages = [
     OnboardingPage(
       illustrationPath: 'assets/illustration1.svg',
-      title: 'This is the title of the onboarding',
+      title: 'Discover Your Wellness Journey',
       subtitle:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam, purus sit amet luctus venenatis',
+          'Take our comprehensive assessment to understand your mental health and wellbeing patterns.',
     ),
     OnboardingPage(
       illustrationPath: 'assets/illustration2.svg',
-      title: 'Stay Organized and Focused',
-      subtitle: 'Keep track of your tasks and projects with ease.',
+      title: 'Get Personalized Insights',
+      subtitle:
+          'Receive detailed analysis and recommendations tailored to your unique profile.',
     ),
     OnboardingPage(
       illustrationPath: 'assets/illustration3.svg',
-      title: 'Achieve Your Goals Faster',
-      subtitle: 'Let us help you stay on top of your game.',
+      title: 'Track Your Progress',
+      subtitle:
+          'Monitor your mental health journey with our intuitive tracking and reporting features.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
           // ✅ Fixed background SVG at top
@@ -79,7 +97,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         page.title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -89,8 +107,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         page.subtitle,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 15,
                           color: Colors.black54,
+                          height: 1.5,
                         ),
                       ),
                     ],
@@ -101,21 +120,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
+
+      // ✅ Modern Bottom Navigation
       bottomSheet: Container(
-        height: 100,
-        padding: const EdgeInsets.symmetric(horizontal: 35),
+        height: 120,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             TextButton(
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginScreen(),
+                  ),
+                );
               },
-              child: const Text("Skip"),
+              child: const Text(
+                "Skip",
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+              ),
             ),
             SmoothPageIndicator(
               controller: controller,
@@ -126,34 +162,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 activeDotColor: Color(0xFF362491),
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                if (controller.page!.toInt() < onboardingPages.length - 1) {
-                  controller.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                } else {
-                  await PrefsHelper.setOnboardingSeen();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+            FadeInUp(
+              duration: AppTheme.animationMedium,
+              delay: const Duration(milliseconds: 400),
+              child: SizedBox(
+                width: 130, // ✅ Fixes invisible button issue
+                child: PrimaryButton(
+                  text:
+                    currentPage < onboardingPages.length - 1
+                        ? "Next"
+                        : "Get Started",
+              
+                  onPressed: () async {
+                    if (currentPage < onboardingPages.length - 1) {
+                      controller.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    } else {
+                      await PrefsHelper.setOnboardingSeen();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    }
+                  },
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                backgroundColor: const Color(0xFF362491),
-              ),
-              child: const Text(
-                "Next",
-                style: TextStyle(color: Colors.white),
               ),
             ),
           ],

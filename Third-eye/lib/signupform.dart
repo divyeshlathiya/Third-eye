@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/models/User.dart';
 import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/otp_verfication_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
-import 'package:thirdeye/sharable_widget/pwd_txt_feild.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
-import 'package:thirdeye/sharable_widget/text_feild.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class Signupform extends StatefulWidget {
   const Signupform({super.key});
@@ -149,66 +150,144 @@ class _SignupformState extends State<Signupform> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(leading: MyBackButton()),
+      backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: MyBackButton(),
+      ),
       resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Center(
-                child: const Text(
-                  "Signup",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+      body: LoadingOverlay(
+        isLoading: isLoading,
+        loadingText: "Creating your account...",
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingL),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: AppTheme.spacingXL),
+                FadeInDown(
+                  duration: AppTheme.animationSlow,
+                  child: Center(
+                    child: Text(
+                      "Create Account",
+                      style:
+                          Theme.of(context).textTheme.displayMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
+                              ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                      child: MyTextFeild(
-                    controller: _firstNameController,
-                    hintText: "John",
-                    labelText: "First name",
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: MyTextFeild(
-                    controller: _lastNameController,
-                    hintText: "Doe",
-                    labelText: "Last name",
-                  )),
-                ],
-              ),
-              const SizedBox(height: 20),
-              MyTextFeild(
-                controller: _emailController,
-                hintText: "Enter your email",
-                labelText: "Email",
-              ),
-              const SizedBox(height: 20),
-              CustomPasswordTextFeild(
-                controller: _passwordController,
-                hintText: "***********",
-              ),
-              const SizedBox(height: 6),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                    onPressed: () {},
-                    child: const Text("must contain 8 characters")),
-              ),
-              const SizedBox(height: 30),
-              _createAccountBtn(),
-              const SizedBox(height: 16),
-              _termsAndConditionsWidget()
-            ],
+                const SizedBox(height: AppTheme.spacingS),
+                FadeInDown(
+                  duration: AppTheme.animationSlow,
+                  delay: const Duration(milliseconds: 200),
+                  child: Center(
+                    child: Text(
+                      "Join us and start your wellness journey",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingXXL),
+
+                // Name Fields
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 400),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: EnhancedInputField(
+                          label: "First Name",
+                          hint: "John",
+                          controller: _firstNameController,
+                          onChanged: (value) => print('First Name: $value'),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.spacingM),
+                      Expanded(
+                        child: EnhancedInputField(
+                          label: "Last Name",
+                          hint: "Doe",
+                          controller: _lastNameController,
+                          onChanged: (value) => print('Last Name: $value'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Email Field
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 600),
+                  child: EmailInputField(
+                    controller: _emailController,
+                    onChanged: (value) => print('Email: $value'),
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Password Field
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 800),
+                  child: PasswordInputField(
+                    controller: _passwordController,
+                    onChanged: (value) => print('Password: $value'),
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingS),
+
+                // Password Requirements
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 1000),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Password must contain at least 8 characters",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textTertiary,
+                          ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingXL),
+
+                // Create Account Button
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 1200),
+                  child: PrimaryButton(
+                    text: "Create Account",
+                    icon: Icons.person_add,
+                    onPressed: _createAccount,
+                    isFullWidth: true,
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingL),
+
+                // Terms and Conditions
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 1400),
+                  child: _termsAndConditionsWidget(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

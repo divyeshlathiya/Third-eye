@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
-import 'package:thirdeye/sharable_widget/button.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class VerifiedScreen extends StatelessWidget {
   const VerifiedScreen({super.key});
@@ -9,38 +11,74 @@ class VerifiedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(AppTheme.spacingL),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // ✅ Only take needed space
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SvgPicture.asset(
-                  "assets/verified.svg", // make sure path is correct
-                  width: 150,
-                  height: 150,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Let's start creating your account so that you can start using this app.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 30),
-                MyButton(
-                  child: Text(
-                    "Start",
-                    style: TextStyle(color: Colors.white),
+                FadeInDown(
+                  duration: AppTheme.animationSlow,
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: AppTheme.successColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusXXL),
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/verified.svg",
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
+                ),
+                const SizedBox(height: AppTheme.spacingXL),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 300),
+                  child: Text(
+                    "Account Verified!",
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 500),
+                  child: Text(
+                    "Let's start creating your account so that you can start using this app.",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingXXL),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 700),
+                  child: PrimaryButton(
+                    text: "Start Your Journey",
+                    icon: Icons.rocket_launch,
+                    onPressed: () {
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DashboardScreen(),
-                        ));
-                  },
+                        ),
+                      );
+                    },
+                    isFullWidth: true,
+                  ),
                 ),
               ],
             ),

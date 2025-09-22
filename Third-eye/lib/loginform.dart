@@ -225,11 +225,14 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 // import 'package:thirdeye/screen/about_yourself.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/screen/forgot_password_screen.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
 import 'package:thirdeye/services/auth_manager.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class Loginform extends StatefulWidget {
   const Loginform({super.key});
@@ -239,7 +242,6 @@ class Loginform extends StatefulWidget {
 }
 
 class _LoginformState extends State<Loginform> {
-  bool _obscurePassword = true;
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   bool isLoading = false;
@@ -288,92 +290,125 @@ class _LoginformState extends State<Loginform> {
     }
   }
 
-  Widget customLoader() => Center(
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 10)],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text("Please wait...", style: TextStyle(fontSize: 16)),
-            ],
-          ),
-        ),
+  Widget customLoader() => LoadingOverlay(
+        isLoading: isLoading,
+        loadingText: "Signing you in...",
+        child: const SizedBox.shrink(),
       );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
         ),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                const Center(
-                    child: Text("Login",
-                        style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold))),
-                const SizedBox(height: 20),
-                TextField(
+      body: LoadingOverlay(
+        isLoading: isLoading,
+        loadingText: "Signing you in...",
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          child: Column(
+            children: [
+              const SizedBox(height: AppTheme.spacingXL),
+              FadeInDown(
+                duration: AppTheme.animationSlow,
+                child: Center(
+                  child: Text(
+                    "Welcome Back",
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingS),
+              FadeInDown(
+                duration: AppTheme.animationSlow,
+                delay: const Duration(milliseconds: 200),
+                child: Center(
+                  child: Text(
+                    "Sign in to continue your wellness journey",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingXXL),
+
+              // Email Input
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 400),
+                child: EmailInputField(
                   controller: _email,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
+                  onChanged: (value) => print('Email: $value'),
                 ),
-                const SizedBox(height: 20),
-                TextField(
+              ),
+
+              const SizedBox(height: AppTheme.spacingM),
+
+              // Password Input
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 600),
+                child: PasswordInputField(
                   controller: _password,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                  ),
+                  onChanged: (value) => print('Password: $value'),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ForgotPasswordScreen())),
-                    child: const Text("Forgot Password?"),
-                  ),
-                ),
-                ElevatedButton(
+              ),
+
+              const SizedBox(height: AppTheme.spacingL),
+
+              // Login Button
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 800),
+                child: PrimaryButton(
+                  text: "Sign In",
+                  icon: Icons.login,
                   onPressed: login,
-                  child: const Text("Login"),
+                  isFullWidth: true,
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: AppTheme.spacingM),
+
+              // Forgot Password
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 1000),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Forgot Password?",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          if (isLoading) customLoader(),
-        ],
+        ),
       ),
     );
   }

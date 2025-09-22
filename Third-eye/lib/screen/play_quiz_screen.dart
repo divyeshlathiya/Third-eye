@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/screen/questions/question1_screen.dart';
 import 'package:thirdeye/screen/questions/question2_screen.dart';
 import 'package:thirdeye/screen/questions/question3_screen.dart';
 import 'package:thirdeye/screen/questions/question4_screen.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class WellnessScreen extends StatefulWidget {
   final bool isMale;
@@ -103,28 +105,43 @@ class _WellnessScreenState extends State<WellnessScreen> {
     final double boxMargin = boxSize * 0.1;
 
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
-        title: const Text(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
           'Start Your Wellness Journey',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(AppTheme.spacingM),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-                  child: Text(
-                    'Choose a quiz column below to explore your path to better mental health.',
-                    style: TextStyle(fontSize: 14),
+                FadeInDown(
+                  duration: AppTheme.animationMedium,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingL,
+                      vertical: AppTheme.spacingM,
+                    ),
+                    child: Text(
+                      'Choose a quiz column below to explore your path to better mental health.',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
                 Center(

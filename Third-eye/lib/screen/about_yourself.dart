@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/screen/verified_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
-import 'package:thirdeye/sharable_widget/button.dart';
-import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class AboutYourSelfScreen extends StatefulWidget {
   final String? accessToken;
@@ -22,8 +23,9 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
 
   Future<void> _submitProfile() async {
     if (selectedDate == null || selectedGender == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select DOB and Gender")),
+      FeedbackSystem.showErrorSnackBar(
+        context,
+        message: "Please select your date of birth and gender",
       );
       return;
     }
@@ -37,17 +39,20 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
     final response =
         await profileRepo.updateDobGender(widget.accessToken, dob, gender);
 
-    // print("🔑 Access Token from storage: ${widget.accessToken}");
-
     setState(() => isLoading = false);
 
     if (response != null) {
+      FeedbackSystem.showSuccessSnackBar(
+        context,
+        message: "Profile updated successfully!",
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const VerifiedScreen()),
       );
     } else {
-      CustomSnackBar.showCustomSnackBar(context, "Failed to update profile");
+      FeedbackSystem.showErrorSnackBar(context,
+          message: "Failed to update profile");
     }
   }
 

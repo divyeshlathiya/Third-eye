@@ -1,4 +1,4 @@
-  import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:thirdeye/repositories/scores_repositories.dart';
@@ -46,7 +46,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       widget.isMale ? _baseBoxCounts : _baseBoxCounts.reversed.toList();
 
   List<List<int>> get boxPoints =>
-    widget.isMale ? _baseBoxPoints : _baseBoxPoints.reversed.toList();
+      widget.isMale ? _baseBoxPoints : _baseBoxPoints.reversed.toList();
   bool get _allQuestionsAnswered {
     return selectedBoxesPerColumn.length == boxCounts.length &&
         // ignore: unnecessary_null_comparison

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/screen/scoreboard_screen.dart';
-import 'package:thirdeye/sharable_widget/button.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class ResultScreen extends StatefulWidget {
   final int score;
@@ -22,118 +24,168 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Placeholder for image/logo
-              Container(
-                height: 120,
-                width: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.star,
-                  size: 60,
-                  color: Color.fromARGB(255, 47, 41, 58),
+              // Success Icon with Animation
+              FadeInDown(
+                duration: AppTheme.animationSlow,
+                child: Container(
+                  height: 120,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.primaryColor,
+                        AppTheme.primaryVariant,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXXL),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryColor.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 60,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppTheme.spacingXXL),
 
               // Title
-              const Text(
-                "You're Today’s Score",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Color(0xFF4B1FA1),
-                  fontWeight: FontWeight.w600,
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  "Today's Score",
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spacingL),
 
-              // Score
-              Text(
-                "${widget.score}",
-                style: const TextStyle(
-                  fontSize: 48,
-                  color: Colors.deepPurple,
-                  fontWeight: FontWeight.bold,
+              // Score with Animation
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 400),
+                child: Text(
+                  "${widget.score}",
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 64,
+                      ),
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spacingL),
 
               // Congrats text
-              Text(
-                "Congratulations!\nGreat Job ${widget.userName}! You have done well",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF4B1FA1),
-                  height: 1.4,
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 600),
+                child: Text(
+                  "Congratulations!\nGreat Job ${widget.userName}! You have done well",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppTheme.textSecondary,
+                        height: 1.4,
+                      ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppTheme.spacingXL),
 
-              // Day + reward button
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4B1FA1),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        "Day ${widget.day}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+              // Day + reward badge
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 800),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingL,
+                    vertical: AppTheme.spacingM,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXXL),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingM,
+                          vertical: AppTheme.spacingS,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusXXL),
+                        ),
+                        child: Text(
+                          "Day ${widget.day}",
+                          style:
+                              Theme.of(context).textTheme.labelMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.monetization_on,
-                        size: 18, color: Colors.amber),
-                    Text(
-                      "${widget.score}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4B1FA1),
+                      const SizedBox(width: AppTheme.spacingM),
+                      Icon(
+                        Icons.monetization_on,
+                        size: 20,
+                        color: AppTheme.secondaryColor,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: AppTheme.spacingS),
+                      Text(
+                        "${widget.score} Points",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryColor,
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.20),
-              MyButton(
-                child: Text("Next"),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ScoreBoardScreen(),
-                    ),
-                  );
-                },
+
+              const SizedBox(height: AppTheme.spacingXXL),
+
+              // Next Button
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 1000),
+                child: PrimaryButton(
+                  text: "View Scoreboard",
+                  icon: Icons.leaderboard,
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScoreBoardScreen(),
+                      ),
+                    );
+                  },
+                  isFullWidth: true,
+                ),
               ),
             ],
           ),

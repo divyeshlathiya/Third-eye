@@ -16,7 +16,7 @@
 // }
 
 // class _LoginScreenState extends State<LoginScreen> {
-  
+
 //   @override
 //   void initState() {
 //     super.initState();
@@ -197,16 +197,18 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/screen/about_yourself.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/loginform.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
 import 'package:thirdeye/signupform.dart';
 import 'package:thirdeye/services/auth_manager.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -262,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
           Positioned(
@@ -287,66 +289,62 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const Spacer(),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
                 child: Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const Signupform()),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.black),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: FadeInLeft(
+                        duration: AppTheme.animationMedium,
+                        delay: const Duration(milliseconds: 200),
+                        child: OutlineButton(
+                          text: "Signup",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const Signupform()),
+                            );
+                          },
                         ),
-                        child: const Text("Signup", style: TextStyle(color: Colors.black)),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: AppTheme.spacingM),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const Loginform()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF362491),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: FadeInRight(
+                        duration: AppTheme.animationMedium,
+                        delay: const Duration(milliseconds: 400),
+                        child: OutlineButton(
+                          text: "Login",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const Loginform()),
+                            );
+                          },
                         ),
-                        child: const Text("Login", style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
+              const SizedBox(height: AppTheme.spacingL),
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 600),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingXL),
+                  child: OutlineButton(
+                    text: "Login with Google",
+                    icon: Icons.login,
                     onPressed: _googleLogin,
-                    icon: Image.asset("assets/google_icon.png", height: 20, width: 20),
-                    label: const Text("Login with Google", style: TextStyle(color: Colors.black)),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.black12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
+                    isFullWidth: true,
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: AppTheme.spacingXL),
             ],
           ),
         ],

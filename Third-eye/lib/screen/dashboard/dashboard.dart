@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/Menu/menu.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/repositories/scores_repositories.dart';
 import 'package:thirdeye/screen/play_quiz_screen.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -28,6 +31,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+  }
+
+  Future<bool> _hasGivenQuizToday() async {
+    try {
+      final scoreData = await _scoreRepository.fetchScore();
+      final scores = scoreData?['scores'] as List<dynamic>? ?? [];
+
+      if (scores.isEmpty) return false;
+
+      final today = DateTime.now();
+      return scores.any((score) {
+        final dateStr =
+            score["date"]; // Make sure your API returns date as string
+        final scoreDate = DateTime.parse(dateStr);
+        return scoreDate.year == today.year &&
+            scoreDate.month == today.month &&
+            scoreDate.day == today.day;
+      });
+    } catch (e) {
+      debugPrint("❌ Error checking today's quiz: $e");
+      return false;
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -74,7 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
       body: RefreshIndicator(
         onRefresh: _loadUserData,
         child: Column(
@@ -139,7 +164,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                       const Spacer(),
-                      IconButton(onPressed: _loadUserData, icon: Icon(Icons.refresh_outlined)),
+                      IconButton(
+                          onPressed: _loadUserData,
+                          icon: Icon(Icons.refresh_outlined)),
                       IconButton(
                         onPressed: () {
                           Navigator.push(
@@ -238,12 +265,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
+                            bool alreadyGiven = await _hasGivenQuizToday();
+                            if (alreadyGiven) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "You have already given the quiz today")),
+                              );
+                              return; // stop further navigation
+                            }
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => WellnessScreen(
-                                      isMale: gender!.toLowerCase() == "male")),
+                                builder: (context) => WellnessScreen(
+                                  isMale: gender!.toLowerCase() == "male",
+                                ),
+                              ),
                             );
                           },
                           child: Text(

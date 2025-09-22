@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/reset_otp_verification.dart';
-import 'package:thirdeye/sharable_widget/button.dart';
-import 'package:thirdeye/sharable_widget/snack_bar.dart';
-import 'package:thirdeye/sharable_widget/text_feild.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -19,7 +19,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _sendOtp() async {
     if (_emailController.text.isEmpty) {
-      CustomSnackBar.showCustomSnackBar(context, "Please enter otp");
+      FeedbackSystem.showErrorSnackBar(context,
+          message: "Please enter your email");
       return;
     }
     setState(() => isLoading = true);
@@ -27,6 +28,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => isLoading = false);
 
     if (success && mounted) {
+      FeedbackSystem.showSuccessSnackBar(context,
+          message: "OTP sent successfully!");
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -35,38 +38,82 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       );
     } else {
-      CustomSnackBar.showCustomSnackBar(context, "Failed to send OTP");
+      FeedbackSystem.showErrorSnackBar(context, message: "Failed to send OTP");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Forgot Password")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            MyTextFeild(
-                controller: _emailController, hintText: "johndoe@gmail.com",labelText: "Email",),
-            const SizedBox(height: 20),
-            MyButton(
-              onPressed: isLoading ? null : _sendOtp,
-              child: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Forgot Password",
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ),
+      body: LoadingOverlay(
+        isLoading: isLoading,
+        loadingText: "Sending OTP...",
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppTheme.spacingXL),
+              FadeInDown(
+                duration: AppTheme.animationSlow,
+                child: Text(
+                  "Reset Password",
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
                       ),
-                    )
-                  : const Text(
-                      "Send OTP",
-                      style: TextStyle(color: Colors.white),
-                    ),
-            ),
-          ],
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingM),
+              FadeInDown(
+                duration: AppTheme.animationSlow,
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  "Enter your email address and we'll send you a code to reset your password.",
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingXXL),
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 400),
+                child: EmailInputField(
+                  controller: _emailController,
+                  hint: "johndoe@gmail.com",
+                  onChanged: (value) => print('Email: $value'),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingXL),
+              FadeInUp(
+                duration: AppTheme.animationMedium,
+                delay: const Duration(milliseconds: 600),
+                child: PrimaryButton(
+                  text: "Send OTP",
+                  icon: Icons.email,
+                  onPressed: _sendOtp,
+                  isFullWidth: true,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

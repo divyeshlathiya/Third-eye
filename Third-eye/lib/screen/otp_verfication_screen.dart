@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/models/User.dart';
 import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/about_yourself.dart';
 import 'package:thirdeye/services/auth_manager.dart';
-
-import 'package:thirdeye/sharable_widget/button.dart';
+import 'package:thirdeye/sharable_widget/index.dart';
+import 'package:thirdeye/config/app_theme.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
-import 'package:thirdeye/sharable_widget/text_feild.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key, required this.email, this.user});
@@ -35,55 +35,54 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _verifyOtp() async {
-  final otp = _otpController.text.trim();
+    final otp = _otpController.text.trim();
 
-  if (otp.isEmpty) {
-    if (!mounted) return;
-    CustomSnackBar.showCustomSnackBar(context, "Please enter OTP");
-    return;
-  }
+    if (otp.isEmpty) {
+      if (!mounted) return;
+      CustomSnackBar.showCustomSnackBar(context, "Please enter OTP");
+      return;
+    }
 
-  setState(() => isLoading = true);
+    setState(() => isLoading = true);
 
-  try {
-    bool validOtp = await _repository.verifyOtp(widget.email, otp, "signup");
-    if (!mounted) return;
-
-    if (validOtp) {
-      // 🔄 Use AuthManager instead of SignUpRepository directly
-      final authManager = AuthManager();
-
-      final registered = await authManager.signUpUser({
-        "firstName": widget.user!.firstName,
-        "lastName": widget.user!.lastName,
-        "email": widget.user!.email,
-        "password": widget.user!.password,
-      });
-
+    try {
+      bool validOtp = await _repository.verifyOtp(widget.email, otp, "signup");
       if (!mounted) return;
 
-      if (registered != null && registered["tokens"] != null) {
-        final accessToken = registered["tokens"]["access_token"];
+      if (validOtp) {
+        // 🔄 Use AuthManager instead of SignUpRepository directly
+        final authManager = AuthManager();
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => AboutYourSelfScreen(accessToken: accessToken),
-          ),
-        );
+        final registered = await authManager.signUpUser({
+          "firstName": widget.user!.firstName,
+          "lastName": widget.user!.lastName,
+          "email": widget.user!.email,
+          "password": widget.user!.password,
+        });
+
+        if (!mounted) return;
+
+        if (registered != null && registered["tokens"] != null) {
+          final accessToken = registered["tokens"]["access_token"];
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AboutYourSelfScreen(accessToken: accessToken),
+            ),
+          );
+        } else {
+          CustomSnackBar.showCustomSnackBar(context, "Error registering user");
+        }
       } else {
-        CustomSnackBar.showCustomSnackBar(context, "Error registering user");
+        CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
       }
-    } else {
-      CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
+    } catch (e) {
+      CustomSnackBar.showCustomSnackBar(context, "Something went wrong: $e");
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
-  } catch (e) {
-    CustomSnackBar.showCustomSnackBar(context, "Something went wrong: $e");
-  } finally {
-    if (mounted) setState(() => isLoading = false);
   }
-}
-
 
   // void _verifyOtp() async {
   //   final otp = _otpController.text.trim();
@@ -183,116 +182,151 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        leading: CircleAvatar(
-          backgroundColor: const Color(0xFFF1F5F9),
-          radius: 0,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-          ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  "Verify Account",
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.075,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Center(
-                child: Text(
-                  "Code has been sent to $_email",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: Text(
-                  "Enter the code to verify your account",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Enter code",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              MyTextFeild(
-                controller: _otpController,
-                labelText: "4 Digit code",
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Didn't receive Code?"),
-                  TextButton(
-                    onPressed: _canResend ? _resendOtp : null,
-                    style: TextButton.styleFrom(
-                      foregroundColor: _canResend ? Colors.blue : Colors.grey,
+      body: LoadingOverlay(
+        isLoading: isLoading,
+        loadingText: "Verifying your code...",
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingXL,
+              vertical: AppTheme.spacingXXL,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FadeInDown(
+                  duration: AppTheme.animationSlow,
+                  child: Center(
+                    child: Text(
+                      "Verify Account",
+                      style:
+                          Theme.of(context).textTheme.displayMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
+                              ),
                     ),
-                    child: const Text("Resend code"),
                   ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Resend code in "),
-                  Text(
-                    _canResend ? "0" : "00:${_secondsRemaining}s",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: AppTheme.spacingXL),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 200),
+                  child: Center(
+                    child: Text(
+                      "Code has been sent to $_email",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textPrimary,
+                          ),
+                    ),
                   ),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.35),
-              MyButton(
-                onPressed: isLoading ? null : _verifyOtp,
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                ),
+                const SizedBox(height: AppTheme.spacingL),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 400),
+                  child: Center(
+                    child: Text(
+                      "Enter the code to verify your account",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textSecondary,
+                          ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingXL),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 600),
+                  child: Text(
+                    "Enter Verification Code",
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
                         ),
-                      )
-                    : const Text(
-                        "Verify OTP",
-                        style: TextStyle(color: Colors.white),
-                      ),
-              ),
-            ],
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 800),
+                  child: EnhancedInputField(
+                    controller: _otpController,
+                    hint: "Enter 6-digit code",
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    onChanged: (value) => print('OTP: $value'),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingL),
+
+                // Resend Code Section
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 1000),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          "Didn't receive Code?",
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppTheme.textSecondary,
+                                  ),
+                        ),
+                        const SizedBox(height: AppTheme.spacingS),
+                        TextButton(
+                          onPressed: _canResend ? _resendOtp : null,
+                          style: TextButton.styleFrom(
+                            foregroundColor: _canResend
+                                ? AppTheme.primaryColor
+                                : AppTheme.textTertiary,
+                          ),
+                          child: Text(
+                            _canResend
+                                ? "Resend Code"
+                                : "Resend in ${_secondsRemaining}s",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.spacingXXL),
+
+                // Verify Button
+                FadeInUp(
+                  duration: AppTheme.animationMedium,
+                  delay: const Duration(milliseconds: 1200),
+                  child: PrimaryButton(
+                    text: "Verify Code",
+                    icon: Icons.verified_user,
+                    onPressed: _verifyOtp,
+                    isFullWidth: true,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

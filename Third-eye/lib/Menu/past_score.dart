@@ -55,10 +55,7 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
         elevation: 0,
         title: const Text(
           "Past Scores",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
       backgroundColor: const Color(0xFFF1EEFE),
@@ -87,26 +84,23 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 // Rocket Image
                 Center(
                   child: Image.asset(
                     "assets/rocket.gif", // make sure file exists
-                    height: 300,
+                    height: 250,
                     fit: BoxFit.contain,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 // Certificate Title
                 const Text(
                   "You've earned a Certificate",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -119,10 +113,7 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                 ),
                 const Text(
                   "Keep up this good work!",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black45,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.black45),
                 ),
 
                 const SizedBox(height: 30),
@@ -169,7 +160,7 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                             "${streak.score > 0 ? '+${streak.score}' : streak.score} 🪙",
+                              "${streak.score > 0 ? '+${streak.score}' : streak.score} 🪙",
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -186,8 +177,10 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
 
                 // Buttons
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -222,12 +215,16 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                           onPressed: () {
                             // ✅ Share logic here
                           },
-                          icon:
-                              const Icon(Icons.share, color: Color(0xFF3B2EB0)),
+                          icon: const Icon(
+                            Icons.share,
+                            color: Color(0xFF3B2EB0),
+                          ),
                           label: const Text(
                             "Share",
                             style: TextStyle(
-                                color: Color(0xFF3B2EB0), fontSize: 16),
+                              color: Color(0xFF3B2EB0),
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),

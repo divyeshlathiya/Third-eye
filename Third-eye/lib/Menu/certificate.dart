@@ -5,6 +5,10 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:thirdeye/repositories/certificate_repository.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+
+import 'package:permission_handler/permission_handler.dart';
 
 class CertificateScreen extends StatefulWidget {
   const CertificateScreen({super.key});
@@ -27,7 +31,7 @@ class _CertificateScreenState extends State<CertificateScreen> {
   }
 
   Future<File> _getLocalFile() async {
-    final dir = await getApplicationDocumentsDirectory(); 
+    final dir = await getApplicationDocumentsDirectory();
     return File("${dir.path}/certificate.png");
   }
 
@@ -45,22 +49,40 @@ class _CertificateScreenState extends State<CertificateScreen> {
     }
   }
 
+  Future<bool> _requestGalleryPermission() async {
+    if (await Permission.photos.request().isGranted) return true;
+    if (await Permission.storage.request().isGranted) return true;
+    return false;
+  }
+
   Future<void> _downloadCertificate() async {
     setState(() => _loading = true);
 
     final bytes = await _repository.getCertificate();
     if (bytes != null) {
+      // Save in app's local storage
       final file = await _getLocalFile();
-      await file.writeAsBytes(bytes); // Save permanently
+      await file.writeAsBytes(bytes);
 
       setState(() {
         _certificateBytes = bytes;
         _localFile = file;
       });
 
+      // 🔹 Save to Gallery
+      // 🔹 Save to Gallery
+      if (await _requestGalleryPermission()) {
+        final result = await ImageGallerySaverPlus.saveImage(
+          bytes,
+          quality: 100,
+          name: "my_certificate_${DateTime.now().millisecondsSinceEpoch}",
+        );
+        debugPrint("Gallery Save Result: $result");
+      }
+
       if (!mounted) return;
       CustomSnackBar.showCustomSnackBar(
-          context, "Certificate downloaded & saved locally");
+          context, "Certificate downloaded to gallery 🎉");
     } else {
       if (!mounted) return;
       CustomSnackBar.showCustomSnackBar(context, "Failed to fetch certificate");
@@ -109,7 +131,8 @@ class _CertificateScreenState extends State<CertificateScreen> {
                 image: DecorationImage(
                   image: _certificateBytes != null
                       ? MemoryImage(_certificateBytes!)
-                      : const AssetImage("assets/Certificate.png") as ImageProvider,
+                      : const AssetImage("assets/Certificate.png")
+                          as ImageProvider,
                   fit: BoxFit.cover,
                 ),
               ),
