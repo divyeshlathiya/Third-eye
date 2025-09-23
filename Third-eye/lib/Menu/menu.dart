@@ -5,11 +5,10 @@ import 'package:thirdeye/Menu/edit_profile.dart';
 import 'package:thirdeye/Menu/faq.dart';
 import 'package:thirdeye/Menu/past_score.dart';
 import 'package:thirdeye/Menu/terms_condition.dart';
-import 'package:thirdeye/repositories/auth_repositories.dart';
-import 'package:thirdeye/repositories/google_auth_repository.dart';
+import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/screen/dashboard/dashboard.dart';
 import 'package:thirdeye/login_screen.dart';
-import 'package:thirdeye/utils/storage_helper.dart';
+import 'package:thirdeye/services/auth_manager.dart';
 
 class MenuDrawer extends StatefulWidget {
   const MenuDrawer({super.key});
@@ -21,6 +20,7 @@ class MenuDrawer extends StatefulWidget {
 class _MenuDrawerState extends State<MenuDrawer> {
   String? firstName;
   String? profilePicUrl;
+  final _profileRepository = ProfileRepository();
 
   @override
   void initState() {
@@ -29,8 +29,10 @@ class _MenuDrawerState extends State<MenuDrawer> {
   }
 
   Future<void> _loadUserData() async {
-    final name = await StorageHelper.getToken('first_name');
-    final pic = await StorageHelper.getToken('profile_pic'); // ✅ fetch pic
+    final profile = await _profileRepository.fetchProfile();
+    final name = profile?["first_name"];
+    final pic = profile?["profile_pic"];
+
     setState(() {
       firstName = name ?? "User";
       profilePicUrl = pic;
@@ -134,7 +136,11 @@ class _MenuDrawerState extends State<MenuDrawer> {
                 children: [
                   const SizedBox(height: 20),
                   _buildMenuItem(Icons.dashboard, "DashBoard", () {
-                    _navigateTo(context, const DashboardScreen());
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DashboardScreen(),
+                        ));
                   }),
                   const SizedBox(height: 20),
                   _buildMenuItem(Icons.history, "Past Scores", () {
@@ -147,7 +153,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   const SizedBox(height: 20),
                   // _buildMenuItem(Icons.description, "Terms & Conditions", () {
                   //   _navigateTo(context, const TermsScreen());
-                  // }),
+                  // }),aaaaaa
                   _buildMenuItem(Icons.description, "Terms & Conditions", () {
                     _navigateTo(context, const TermsScreen());
                   }),
@@ -217,11 +223,8 @@ void _navigateTo(BuildContext context, Widget screen) {
 }
 
 void _logout(BuildContext context) async {
-  AuthRepository repo = AuthRepository();
-  repo.logout();
-
-  GoogleAuthRepository googleRepo = GoogleAuthRepository();
-  await googleRepo.signOut();
+  final authMang = AuthManager();
+  authMang.logout();
 
   Navigator.pushAndRemoveUntil(
     context,

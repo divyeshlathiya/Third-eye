@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/screen/verified_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/index.dart';
-import 'package:thirdeye/config/app_theme.dart';
 
 class AboutYourSelfScreen extends StatefulWidget {
   final String? accessToken;

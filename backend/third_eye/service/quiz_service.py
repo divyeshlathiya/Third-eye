@@ -30,7 +30,7 @@ def can_take_quiz(db: Session, user_id: str) -> bool:
 
     now = datetime.now(timezone.utc)
 
-    if now - last_taken < timedelta(minutes=5):
+    if now - last_taken < timedelta(days=1):
         return False
 
     return True

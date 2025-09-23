@@ -83,31 +83,31 @@ class _SignupformState extends State<Signupform> {
     }
   }
 
-  Widget _createAccountBtn() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : _createAccount,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          backgroundColor: const Color(0xFF362491), // Purpl  e shade
-        ),
-        child: isLoading
-            ? SizedBox(
-                width: 20, height: 20, child: CircularProgressIndicator())
-            : const Text(
-                "Create Account",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-      ),
-    );
-  }
+  // Widget _createAccountBtn() {
+  //   return SizedBox(
+  //     width: double.infinity,
+  //     child: ElevatedButton(
+  //       onPressed: isLoading ? null : _createAccount,
+  //       style: ElevatedButton.styleFrom(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(25),
+  //         ),
+  //         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  //         backgroundColor: const Color(0xFF362491), // Purpl  e shade
+  //       ),
+  //       child: isLoading
+  //           ? SizedBox(
+  //               width: 20, height: 20, child: CircularProgressIndicator())
+  //           : const Text(
+  //               "Create Account",
+  //               style: TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.white,
+  //               ),
+  //             ),
+  //     ),
+  //   );
+  // }
 
   Widget _termsAndConditionsWidget() {
     return Center(

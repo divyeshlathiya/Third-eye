@@ -151,7 +151,7 @@ class _ScoreBoardScreenState extends State<ScoreBoardScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.asset(
-                "assets/Card2.png",
+                "assets/Card2.jpg",
                 fit: BoxFit.fitWidth,
                 width: double.infinity,
               ),
