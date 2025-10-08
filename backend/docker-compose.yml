@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  thirdeye-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thirdeye-backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: >
+      gunicorn -k uvicorn.workers.UvicornWorker 
+      third_eye.main:app 
+      --bind 0.0.0.0:8000 
+      --workers 4 
+      --timeout 120
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis   # <-- important, your FastAPI should read this
+
+  redis:
+    image: redis:7-alpine
+    container_name: thirdeye-redis
+    ports:
+      - "6379:6379"
+    restart: always

@@ -160,7 +160,7 @@ class _Question2ScreenState extends State<Question2Screen> {
     return QuestionScreen(
       columnIndex: 1,
       boxImages: images,
-      questionText: "This is Question 2: Select from 5 boxes",
+      questionText: "Select from 5 boxes",
       boxTips: tips,
       onNext: () {
         Navigator.push(

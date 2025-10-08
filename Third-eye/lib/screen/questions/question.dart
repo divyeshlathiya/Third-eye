@@ -619,7 +619,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     },
                   ),
 
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
 
                   /// Info box
                   Container(

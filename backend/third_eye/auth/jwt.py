@@ -1,12 +1,15 @@
+from pathlib import Path
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+env_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -43,6 +46,7 @@ def decode_access_token(token: str):
         return jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
     except JWTError:
         return None
+
 
 def issue_tokens(user_email: str):
     access_token = create_access_token(

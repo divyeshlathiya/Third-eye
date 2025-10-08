@@ -166,7 +166,7 @@ class _Question1ScreenState extends State<Question1Screen> {
     return QuestionScreen(
       columnIndex: 0,
       boxImages: images,
-      questionText: "This is Question 1: Select from 3 boxes",
+      questionText: "Select from 3 boxes",
       boxTips: tips,
       onNext: () {
         Navigator.push(

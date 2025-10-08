@@ -155,7 +155,7 @@ class _Question4ScreenState extends State<Question4Screen> {
     return QuestionScreen(
       columnIndex: 3,
       boxImages: images,
-      questionText: "This is Question 3: Select from 7 boxes",
+      questionText: "Select from 7 boxes",
       boxTips: tips,
       onNext: () {
         ScaffoldMessenger.of(context).showSnackBar(

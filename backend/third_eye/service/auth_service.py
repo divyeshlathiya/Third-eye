@@ -13,7 +13,7 @@ from ..models.user import User
 from ..schemas.user import CreateUser, ShowUser, LoginUser, UpdateDOBGender, RegisterResponce, UpdateProfile
 from ..schemas.otp import OtpRequest, OtpVerifyRequest
 from ..utils.email_utils import send_otp_email
-from ..utils.otp_utils import generate_otp, verify_otp, save_otp, verified_emails, reset_verified_emails
+from ..utils.otp_utils import generate_otp, is_email_verified, mark_email_verified, remove_verified_email, verify_otp, save_otp, verified_emails, reset_verified_emails
 
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
@@ -80,16 +80,43 @@ async def send_otp(data: OtpRequest, db: Session = Depends(get_db)):
     return {"message": "OTP sent successfully"}
 
 
+# @router.post("/verify-otp")
+# def verify_email_otp(data: OtpVerifyRequest):
+#     if verify_otp(data.email, data.otp):
+#         if data.purpose == "signup":
+#             verified_emails.add(data.email)
+#         elif data.purpose == "reset":
+#             reset_verified_emails.add(data.email)
+#         return {"message": "Email verified successfully"}
+#     raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+
 @router.post("/verify-otp")
 def verify_email_otp(data: OtpVerifyRequest):
     if verify_otp(data.email, data.otp):
-        if data.purpose == "signup":
-            verified_emails.add(data.email)
-        elif data.purpose == "reset":
-            reset_verified_emails.add(data.email)
+        # store verified email in Redis instead of in-memory set
+        mark_email_verified(data.email, purpose=data.purpose)
         return {"message": "Email verified successfully"}
     raise HTTPException(status_code=400, detail="Invalid or expired OTP")
 
+
+# @router.post("/forgot-password/reset")
+# def reset_password(
+#     email: str = Body(...),
+#     new_password: str = Body(...),
+#     db: Session = Depends(get_db)
+# ):
+#     if email not in reset_verified_emails:
+#         raise HTTPException(
+#             status_code=400, detail="OTP not verified for reset")
+
+#     user = db.query(User).filter(User.email == email).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+
+#     user.password = hash_password(new_password)
+#     db.commit()
+#     reset_verified_emails.remove(email)
+#     return {"message": "Password reset successful"}
 
 @router.post("/forgot-password/reset")
 def reset_password(
@@ -97,7 +124,8 @@ def reset_password(
     new_password: str = Body(...),
     db: Session = Depends(get_db)
 ):
-    if email not in reset_verified_emails:
+    # check Redis for verified email for password reset
+    if not is_email_verified(email, purpose="reset"):
         raise HTTPException(
             status_code=400, detail="OTP not verified for reset")
 
@@ -107,7 +135,10 @@ def reset_password(
 
     user.password = hash_password(new_password)
     db.commit()
-    reset_verified_emails.remove(email)
+
+    # remove verification after reset
+    remove_verified_email(email, purpose="reset")
+
     return {"message": "Password reset successful"}
 
 
@@ -175,7 +206,7 @@ def update_profile(
 def register(user: CreateUser, db: Session = Depends(get_db)):
     try:
 
-        if user.email not in verified_emails:
+        if not is_email_verified(user.email, purpose="signup"):
             raise HTTPException(
                 status_code=400,
                 detail="Email not verified. Please verify OTP first."
@@ -197,7 +228,8 @@ def register(user: CreateUser, db: Session = Depends(get_db)):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        verified_emails.remove(user.email)
+
+        remove_verified_email(user.email, purpose="signup")
 
         tokens = issue_tokens(new_user.email)
 

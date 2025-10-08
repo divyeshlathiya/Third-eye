@@ -9,7 +9,9 @@ from .database.database import Base, engine
 from .models.user import User
 from .models.quiz_score import QuizScore
 from .models.user_streak import UserStreak
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = FastAPI()
 
