@@ -1,6 +1,6 @@
 from fastapi_mail import ConnectionConfig
 from pydantic import BaseModel, EmailStr
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 import os
 from dotenv import load_dotenv
 from pathlib import Path
