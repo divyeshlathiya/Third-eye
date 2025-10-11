@@ -1,6 +1,7 @@
 fastapi
 uvicorn
-pydantic
+# pydantic
+pydantic<2.0
 python-jose
 passlib[argon2]
 python-dotenv
