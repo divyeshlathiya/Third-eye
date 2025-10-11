@@ -23,7 +23,15 @@ if DATABASE_URL.startswith("sqlite"):
         DATABASE_URL, connect_args={"check_same_thread": False}
     )
 else:
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"sslmode": "require"},
+        pool_pre_ping=True,
+        pool_size=2,          # ⬅️ reduced per worker
+        max_overflow=1,       # ⬅️ small overflow allowance
+        pool_timeout=30,
+        pool_recycle=1200     # recycle every 20 min
+    )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()
