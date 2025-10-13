@@ -3,20 +3,43 @@ import 'package:http/http.dart' as http;
 import '../config/urls.dart';
 
 class AuthService {
+  // static Future<Map<String, dynamic>?> login(
+  //     String email, String password) async {
+  //   final url = Uri.parse(ConfigURL.loginURL);
+
+  //   final response = await http.post(
+  //     url,
+  //     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  //     body: {'username': email, 'password': password},
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     return json.decode(response.body);
+  //   }
+  //   return null;
+  // }
   static Future<Map<String, dynamic>?> login(
       String email, String password) async {
     final url = Uri.parse(ConfigURL.loginURL);
-
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {'username': email, 'password': password},
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {'username': email, 'password': password},
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      if (response.statusCode == 400) {
+        return {"error": "Already a Google sign-in user"};
+      }
+      if (response.statusCode == 401) {
+        return {"error": "Invalid email or password"};
+      }
+      return {"error": "Something went wrong"};
+    } catch (e) {
+      return {"error": "Network error"};
     }
-    return null;
   }
 
   static Future<Map<String, dynamic>?> refreshToken(String refreshToken) async {

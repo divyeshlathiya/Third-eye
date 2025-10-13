@@ -107,7 +107,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 delay: const Duration(milliseconds: 600),
                 child: PrimaryButton(
                   text: "Send OTP",
-                  icon: Icons.email,
+                  icon: const Icon(Icons.email),
                   onPressed: _sendOtp,
                   isFullWidth: true,
                 ),

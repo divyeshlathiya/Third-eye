@@ -338,7 +338,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       horizontal: AppTheme.spacingXL),
                   child: OutlineButton(
                     text: "Login with Google",
-                    icon: Icons.login,
+                    icon: Image.asset(
+                      "assets/google_icon.png", // Path to your Google icon
+                      height: 24,
+                      width: 24,
+                    ), // Use a valid icon or replace with an Image.asset for Google logo
                     onPressed: _googleLogin,
                     isFullWidth: true,
                   ),

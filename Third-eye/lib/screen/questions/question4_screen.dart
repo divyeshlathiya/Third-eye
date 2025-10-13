@@ -124,6 +124,17 @@ class _Question4ScreenState extends State<Question4Screen> {
       "Separation\n\nTip- repeated anger and disrespect suggest incompatibility.\nInnerchild has 40% of emotional energy\nAnd get activated by special people, its privilege, everyone is not that lucky.\nIt's like routinely riding bike of 150-200 cc Suddenly you drive 1200 cc bike.\nand save your innerchild.\nYou have to learn and handle it well.\nIf it is not under control it can destroy you.\n\nTake care of your core.\nwhen it get destroyed living without innerchild is so painfull. The deep memories can destroy you in guilt.\nYour emotions are strongest in the core That's why you can justify all thought and action.",
     ];
 
+    final maleText = [
+      "Male Box 0 text here...",
+      "Male Box 1 text here...",
+      "Male Box 2 text here...",
+      "Male Box 3 text here...",
+      "Male Box 4 text here...",
+      "Male Box 5 text here...",
+      "Male Box 6 text here...",
+      "Male Box 7 text here...",
+      "Male Box 8 text here...",
+    ];
     // ✅ Female data (replace with your own)
     final femaleImages = [
       "assets/agna.png",
@@ -148,15 +159,29 @@ class _Question4ScreenState extends State<Question4Screen> {
       "Its okay,Focus your energy in other stuff that has true meaning in your life,To become neutral focus on deep breathing The feeling is just temporary and only 10% your of your total energy",
       "Tip for Box 8",
     ];
+    final femaleText = [
+      "Female Box 0 text here...",
+      "Female Box 1 text here...",
+      "Female Box 2 text here...",
+      "Female Box 3 text here...",
+      "Female Box 4 text here...",
+      "Female Box 5 text here...",
+      "Female Box 6 text here...",
+      "Female Box 7 text here...",
+      "Female Box 8 text here...",
+    ];
 
     // ✅ Choose based on gender
     final images = widget.isMale ? maleImages : femaleImages;
     final tips = widget.isMale ? maleTips : femaleTips;
+    final texts = widget.isMale ? maleText : femaleText;
+
     return QuestionScreen(
       columnIndex: 3,
       boxImages: images,
       questionText: "Select from 7 boxes",
       boxTips: tips,
+      boxText: texts,
       onNext: () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Quiz Completed!")),

@@ -8,7 +8,7 @@ class EnhancedButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final ButtonType type;
-  final IconData? icon;
+  final Widget? icon;
   final bool isLoading;
   final bool isFullWidth;
   final EdgeInsetsGeometry? padding;
@@ -112,7 +112,8 @@ class _EnhancedButtonState extends State<EnhancedButton>
                     onTap: widget.onPressed,
                     child: Container(
                       padding: widget.padding ??
-                          const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
                       child: widget.isLoading
                           ? _buildLoadingIndicator()
                           : _buildButtonContent(),
@@ -131,19 +132,16 @@ class _EnhancedButtonState extends State<EnhancedButton>
     if (widget.icon != null) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min, // keeps content compact
         children: [
-          Icon(
-            widget.icon,
-            color: _getTextColor(),
-            size: 20,
-          ),
+          widget.icon!, // directly use widget (can be Icon or Image.asset)
           const SizedBox(width: 8),
           Text(
             widget.text,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: _getTextColor(),
-              fontWeight: FontWeight.w600,
-            ),
+                  color: _getTextColor(),
+                  fontWeight: FontWeight.w600,
+                ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -154,9 +152,9 @@ class _EnhancedButtonState extends State<EnhancedButton>
       child: Text(
         widget.text,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: _getTextColor(),
-          fontWeight: FontWeight.w600,
-        ),
+              color: _getTextColor(),
+              fontWeight: FontWeight.w600,
+            ),
         textAlign: TextAlign.center,
       ),
     );
@@ -177,7 +175,7 @@ class _EnhancedButtonState extends State<EnhancedButton>
 
   Color _getBackgroundColor() {
     if (widget.backgroundColor != null) return widget.backgroundColor!;
-    
+
     switch (widget.type) {
       case ButtonType.primary:
         return AppTheme.primaryColor;
@@ -194,7 +192,7 @@ class _EnhancedButtonState extends State<EnhancedButton>
 
   Color _getTextColor() {
     if (widget.textColor != null) return widget.textColor!;
-    
+
     switch (widget.type) {
       case ButtonType.primary:
       case ButtonType.secondary:

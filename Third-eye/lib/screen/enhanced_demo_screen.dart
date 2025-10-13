@@ -106,7 +106,7 @@ class _EnhancedDemoScreenState extends State<EnhancedDemoScreen> {
             // Primary Button
             PrimaryButton(
               text: 'Primary Action',
-              icon: Icons.check,
+              icon: const Icon(Icons.check),
               onPressed: () => _showSnackBar('Primary button pressed'),
             ),
 
@@ -131,7 +131,7 @@ class _EnhancedDemoScreenState extends State<EnhancedDemoScreen> {
             // Gradient Button
             GradientButton(
               text: 'Gradient Action',
-              icon: Icons.star,
+              icon: Icon(Icons.star),
               onPressed: () => _showSnackBar('Gradient button pressed'),
             ),
 

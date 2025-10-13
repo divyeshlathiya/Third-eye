@@ -320,7 +320,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   delay: const Duration(milliseconds: 1200),
                   child: PrimaryButton(
                     text: "Verify Code",
-                    icon: Icons.verified_user,
+                    icon: const Icon(Icons.verified_user),
                     onPressed: _verifyOtp,
                     isFullWidth: true,
                   ),

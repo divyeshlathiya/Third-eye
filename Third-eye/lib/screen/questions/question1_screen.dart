@@ -89,8 +89,6 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
 import 'package:thirdeye/screen/questions/question.dart';
 import 'question2_screen.dart';
@@ -133,16 +131,27 @@ class _Question1ScreenState extends State<Question1Screen> {
       "Its okay,Focus your energy in other stuff that has true meaning in your life,To become neutral focus on deep breathing The feeling is just temporary and only 10% your of your total energy",
       "Tip for Box 8",
     ];
+    final maleText = [
+      "Male Box 0 text here...",
+      "Male Box 1 text here...",
+      "Male Box 2 text here...",
+      "Male Box 3 text here...",
+      "Male Box 4 text here...",
+      "Male Box 5 text here...",
+      "Male Box 6 text here...",
+      "Male Box 7 text here...",
+      "Male Box 8 text here...",
+    ];
 
     // ✅ Female data (replace with your own)
     final femaleImages = [
       "assets/q4-40.jpg",
       "assets/q4-30.png",
-      "assets/q4-20.png",
+      "assets/fq1-20.png",
       "assets/q4-10.png",
-      "assets/q4-0.png",
-      "assets/q4-neg10.png",
-      "assets/q4-neg20.png",
+      "assets/fq1-0.png",
+      "assets/fq1-neg10.png",
+      "assets/fq1-neg20.png",
       "assets/q4-neg30.png",
       "assets/q4-neg40.png",
     ];
@@ -158,16 +167,29 @@ class _Question1ScreenState extends State<Question1Screen> {
       "Anger violent all things getting wrong\n\nTip- you are angry / violent with your partner may be because many unfulfilled Expectations which might be true and justifiable.Anger is natural defensive power full action to protect your self. Anger is dangerously distructive.Innerchild has highest power, memory, feeling.\nIf you are using against the one you love routinely you might loose them eventually Initially loss of emotional attachment and than physical attachment.So you need to find the reason of unfulfilment may be your partners feeling is lesser than you or they are doing more responsible things that needed to be done.In any case you must understand that they are core for your innerchild which has 40% of your emotions. U have to forgive them and give them what they desire.",
       "Separation\n\nTip- repeated anger and disrespect suggest incompatibility.\nInnerchild has 40% of emotional energy\nAnd get activated by special people, its privilege, everyone is not that lucky.\nIt's like routinely riding bike of 150-200 cc Suddenly you drive 1200 cc bike.\nand save your innerchild.\nYou have to learn and handle it well.\nIf it is not under control it can destroy you.\n\nTake care of your core.\nwhen it get destroyed living without innerchild is so painfull. The deep memories can destroy you in guilt.\nYour emotions are strongest in the core That's why you can justify all thought and action.",
     ];
+    final femaleText = [
+      "Female Box 0 text here...",
+      "Female Box 1 text here...",
+      "Female Box 2 text here...",
+      "Female Box 3 text here...",
+      "Female Box 4 text here...",
+      "Female Box 5 text here...",
+      "Female Box 6 text here...",
+      "Female Box 7 text here...",
+      "Female Box 8 text here...",
+    ];
 
     // ✅ Choose based on gender
     final images = widget.isMale ? maleImages : femaleImages;
     final tips = widget.isMale ? maleTips : femaleTips;
+    final texts = widget.isMale ? maleText : femaleText;
 
     return QuestionScreen(
       columnIndex: 0,
       boxImages: images,
       questionText: "Select from 3 boxes",
       boxTips: tips,
+      boxText: texts,
       onNext: () {
         Navigator.push(
           context,
@@ -177,7 +199,8 @@ class _Question1ScreenState extends State<Question1Screen> {
           ),
         );
       },
-      onPrevious: () => Navigator.pop(context), isMale: widget.isMale,
+      onPrevious: () => Navigator.pop(context),
+      isMale: widget.isMale,
     );
   }
 }

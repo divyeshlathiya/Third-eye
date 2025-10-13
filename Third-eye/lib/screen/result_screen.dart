@@ -175,7 +175,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 delay: const Duration(milliseconds: 1000),
                 child: PrimaryButton(
                   text: "View Scoreboard",
-                  icon: Icons.leaderboard,
+                  icon: const Icon(Icons.leaderboard),
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,

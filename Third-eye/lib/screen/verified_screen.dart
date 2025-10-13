@@ -68,7 +68,7 @@ class VerifiedScreen extends StatelessWidget {
                   delay: const Duration(milliseconds: 700),
                   child: PrimaryButton(
                     text: "Start Your Journey",
-                    icon: Icons.rocket_launch,
+                    icon: const Icon(Icons.rocket_launch),
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,

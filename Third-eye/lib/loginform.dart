@@ -248,13 +248,65 @@ class _LoginformState extends State<Loginform> {
 
   final AuthManager _authManager = AuthManager();
 
+  // void login() async {
+  //   final email = _email.text;
+  //   final pwd = _password.text;
+
+  //   if (email.isNotEmpty && pwd.isNotEmpty) {
+  //     setState(() => isLoading = true);
+
+  //     final success = await _authManager.login(email, pwd);
+  //     setState(() => isLoading = false);
+
+  //     if (!mounted) return;
+
+  //     if (success) {
+  //       final profile = await _authManager.getProfile();
+  //       final firstName = profile?['first_name'] ?? "User";
+
+  //       final dob = profile?['dob'];
+  //       final gender = profile?['gender'];
+
+  //       if (dob == null || gender == null) {
+  //         // final accessToken = await _authManager.getProfile();
+  //         Navigator.pushReplacement(
+  //             context, MaterialPageRoute(builder: (_) => DashboardScreen()));
+  //       } else {
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(builder: (_) => const DashboardScreen()),
+  //         );
+  //       }
+
+  //       CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
+  //           backgroundColor: Colors.purple);
+  //     } else {
+  //       CustomSnackBar.showCustomSnackBar(context, "Invalid email or password",
+  //           backgroundColor: Colors.red);
+  //     }
+  //   } else {
+  //     CustomSnackBar.showCustomSnackBar(context, "Please fill in both fields",
+  //         backgroundColor: Colors.red);
+  //   }
+  // }
+
   void login() async {
     final email = _email.text;
     final pwd = _password.text;
 
-    if (email.isNotEmpty && pwd.isNotEmpty) {
-      setState(() => isLoading = true);
+    if (email.isEmpty || pwd.isEmpty) {
+      CustomSnackBar.showCustomSnackBar(
+        context,
+        "Please fill in both fields",
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
 
+    setState(() => isLoading = true);
+
+    try {
+      // _authManager.login throws error message if login fails
       final success = await _authManager.login(email, pwd);
       setState(() => isLoading = false);
 
@@ -263,14 +315,15 @@ class _LoginformState extends State<Loginform> {
       if (success) {
         final profile = await _authManager.getProfile();
         final firstName = profile?['first_name'] ?? "User";
-
         final dob = profile?['dob'];
         final gender = profile?['gender'];
 
+        // Keep your existing navigation logic
         if (dob == null || gender == null) {
-          // final accessToken = await _authManager.getProfile();
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => DashboardScreen()));
+            context,
+            MaterialPageRoute(builder: (_) => DashboardScreen()),
+          );
         } else {
           Navigator.pushReplacement(
             context,
@@ -278,15 +331,21 @@ class _LoginformState extends State<Loginform> {
           );
         }
 
-        CustomSnackBar.showCustomSnackBar(context, "Welcome $firstName",
-            backgroundColor: Colors.purple);
-      } else {
-        CustomSnackBar.showCustomSnackBar(context, "Invalid email or password",
-            backgroundColor: Colors.red);
+        CustomSnackBar.showCustomSnackBar(
+          context,
+          "Welcome $firstName",
+          backgroundColor: Colors.purple,
+        );
       }
-    } else {
-      CustomSnackBar.showCustomSnackBar(context, "Please fill in both fields",
-          backgroundColor: Colors.red);
+    } catch (errorMessage) {
+      setState(() => isLoading = false);
+
+      // Show API/network error in SnackBar
+      CustomSnackBar.showCustomSnackBar(
+        context,
+        errorMessage.toString(),
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -376,7 +435,7 @@ class _LoginformState extends State<Loginform> {
                 delay: const Duration(milliseconds: 800),
                 child: PrimaryButton(
                   text: "Sign In",
-                  icon: Icons.login,
+                  icon: Icon(Icons.login),
                   onPressed: login,
                   isFullWidth: true,
                 ),

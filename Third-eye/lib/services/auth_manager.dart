@@ -40,13 +40,26 @@ class AuthManager {
   }
 
   /// Login with email/password
+  // Future<bool> login(String email, String password) async {
+  //   final success = await _authRepo.login(email, password);
+  //   if (success) {
+  //     final accessToken = await _authRepo.getAccessToken();
+  //     if (accessToken != null) _startAutoRefresh(accessToken);
+  //   }
+  //   return success;
+  // }
+
   Future<bool> login(String email, String password) async {
-    final success = await _authRepo.login(email, password);
-    if (success) {
+    final result = await _authRepo.login(email, password);
+
+    if (result['success'] == true) {
       final accessToken = await _authRepo.getAccessToken();
       if (accessToken != null) _startAutoRefresh(accessToken);
+      return true;
+    } else {
+      // Pass the error message up
+      throw result['message'];
     }
-    return success;
   }
 
   /// Login with Google

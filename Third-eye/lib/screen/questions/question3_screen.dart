@@ -127,6 +127,17 @@ class _Question3ScreenState extends State<Question3Screen> {
       "Sad confuse in career.\n\n Tip- find exact reason for your confusion / sadness, it can be job itself?, lack of direction?,feeling exhausted and overwhelming, or external pressure by society family friends? Addres it responsible.",
       "Angry violent argument disrespected.\n\nTip- It's ok to be angry when you don't get what you expected. When things get wrong. And worsen over period.Than you need to ask yourself.\n\nWhat is truly important in your career?\nEg- financial stability/creativity/work life balance/helping others etc.\nWhat are your strengths and weakness?\nHow your ideal day would be?\nIs this work part of the ideal day?\nConnect with people who is doing well in your field or in field you are cosidering.\n\nIf u feel still confused take break give rest to professional layer of emotion and focus on other layer. You can get true happiness without it as well.",
     ];
+    final maleText = [
+      "Male Box 0 text here...",
+      "Male Box 1 text here...",
+      "Male Box 2 text here...",
+      "Male Box 3 text here...",
+      "Male Box 4 text here...",
+      "Male Box 5 text here...",
+      "Male Box 6 text here...",
+      "Male Box 7 text here...",
+      "Male Box 8 text here...",
+    ];
 
     // ✅ Female data (replace with your own)
     final femaleImages = [
@@ -152,15 +163,29 @@ class _Question3ScreenState extends State<Question3Screen> {
       "box 7 tip",
       "Ask yourself what's truly important Take a pause. Explore other layers of energy.",
     ];
+    final femaleText = [
+      "Female Box 0 text here...",
+      "Female Box 1 text here...",
+      "Female Box 2 text here...",
+      "Female Box 3 text here...",
+      "Female Box 4 text here...",
+      "Female Box 5 text here...",
+      "Female Box 6 text here...",
+      "Female Box 7 text here...",
+      "Female Box 8 text here...",
+    ];
 
     // ✅ Choose based on gender
     final images = widget.isMale ? maleImages : femaleImages;
     final tips = widget.isMale ? maleTips : femaleTips;
+    final texts = widget.isMale ? maleText : femaleText;
+
     return QuestionScreen(
       columnIndex: 2,
       boxImages: images,
       questionText: "Select from 7 boxes",
       boxTips: tips,
+      boxText: texts,
       onNext: () {
         Navigator.push(
           context,

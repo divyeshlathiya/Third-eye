@@ -326,7 +326,6 @@
 //   }
 // }
 
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -343,6 +342,7 @@ class QuestionScreen extends StatefulWidget {
   final List<String> boxImages;
   final List<String>? boxTips;
   final bool isMale;
+  final List<String> boxText;
 
   const QuestionScreen({
     super.key,
@@ -353,6 +353,7 @@ class QuestionScreen extends StatefulWidget {
     required this.boxImages,
     required this.boxTips,
     required this.isMale,
+    required this.boxText,
   });
 
   @override
@@ -375,7 +376,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
       widget.isMale ? _baseBoxCounts : _baseBoxCounts.reversed.toList();
 
   List<List<int>> get boxPoints =>
-    widget.isMale ? _baseBoxPoints : _baseBoxPoints.reversed.toList();
+      widget.isMale ? _baseBoxPoints : _baseBoxPoints.reversed.toList();
   bool get _allQuestionsAnswered {
     return selectedBoxesPerColumn.length == boxCounts.length &&
         // ignore: unnecessary_null_comparison
@@ -445,10 +446,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+                      Text(
+                        widget.boxText[index],
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       const SizedBox(height: 16),
 
@@ -461,20 +463,19 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: widget.boxImages[index].endsWith(".svg")
                               ? SvgPicture.asset(
-                            widget.boxImages[index],
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          )
+                                  widget.boxImages[index],
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                )
                               : Image.asset(
-                            widget.boxImages[index],
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
+                                  widget.boxImages[index],
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
-
 
                       const SizedBox(height: 12),
                       Text(
