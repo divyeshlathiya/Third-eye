@@ -13,3 +13,4 @@ firebase-admin
 psycopg2-binary
 Pillow
 redis
+mailjet-rest
