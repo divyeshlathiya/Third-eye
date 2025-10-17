@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:thirdeye/Menu/PrivacyPolicyScreen.dart';
+import 'package:thirdeye/Menu/terms_condition.dart';
 import 'package:thirdeye/models/User.dart';
 import 'package:thirdeye/repositories/sign_up_repository.dart';
 import 'package:thirdeye/screen/otp_verfication_screen.dart';
@@ -121,7 +123,14 @@ class _SignupformState extends State<Signupform> {
                   fontWeight: FontWeight.bold,
                   color: Colors.blueAccent,
                 ),
-                recognizer: TapGestureRecognizer()..onTap = () {},
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TermsScreen()),
+                    );
+                  },
               ),
               const TextSpan(text: ' and '),
               TextSpan(
@@ -130,7 +139,14 @@ class _SignupformState extends State<Signupform> {
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
                 ),
-                recognizer: TapGestureRecognizer()..onTap = () {},
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const PrivacyPolicyScreen()),
+                    );
+                  },
               ),
             ],
           ),

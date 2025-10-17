@@ -21,17 +21,17 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           children: [
             Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur eget id morbi amet amet, in. Ipsum viverra pretium tellus neque. Ullamcorper suspendisse aenean leo pharetra in sit semper et. Amet quam placerat sem."),
+                "THIRD EYE: Emotion Tracker is an initiative envisioned by Dr. Himanshu Rathwa, an Orthopaedic Surgeon based in Chhota Udepur, Gujarat, who believes that true healing begins with self-awareness. Inspired by his vision, DS Developers designed and developed this mobile application to help individuals build emotional clarity through consistency and reflection."),
             SizedBox(
               height: 20,
             ),
             Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur eget id morbi amet amet, in. Ipsum viverra pretium tellus neque. Ullamcorper suspendisse aenean leo pharetra in sit semper et. Amet quam placerat sem.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur eget id morbi amet amet, in. Ipsum viverra pretium tellus neque. Ullamcorper suspendisse aenean leo pharetra in sit semper et. Amet quam placerat sem."),
+                "The app encourages users to engage in a short, four-question daily emotional self-assessment. Each response contributes to a personal emotional score that helps users track their emotional patterns, visualize progress through graphical insights, and enhance their emotional balance over time. Upon maintaining a 21-day consistency streak, users are rewarded with a Certificate of Self-Awareness, symbolizing their commitment to mindfulness and emotional discipline."),
             SizedBox(
               height: 20,
             ),
             Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur eget id morbi amet amet, in. Ipsum viverra pretium tellus neque. Ullamcorper suspendisse aenean leo pharetra in sit semper et. Amet quam placerat sem.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra condimentum eget purus in. Consectetur eget id morbi amet amet, in. Ipsum viverra pretium tellus neque. Ullamcorper suspendisse aenean leo pharetra in sit semper et. Amet quam placerat sem."),
+                "THIRD EYE: Emotion Tracker aims to bridge the gap between technology and wellness by offering an innovative yet simple way for individuals to pause, reflect, and reconnect with their emotions. Our mission is to make emotional wellness measurable, accessible, and rewarding, while our vision is to help individuals cultivate a habit of introspection that leads to a more mindful and emotionally balanced life. For feedback or support, please contact thirdeye.support@gmail.com. © 2025 THIRD EYE. All Rights Reserved."),
           ],
         ),
       ),
