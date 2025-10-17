@@ -468,7 +468,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                   height: 200,
                                   fit: BoxFit.cover,
                                 )
-                              : Image.asset(
+                              : Image.network(
                                   widget.boxImages[index],
                                   width: 200,
                                   height: 200,
@@ -603,7 +603,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                   : 2, // thicker border when selected
                             ),
                             image: DecorationImage(
-                              image: AssetImage(widget.boxImages[index]),
+                              image: widget.boxImages[index].startsWith("http")
+                                  ? NetworkImage(widget.boxImages[index])
+                                  : AssetImage(widget.boxImages[index])
+                                      as ImageProvider,
                               fit: BoxFit.cover,
                             ),
                           ),
