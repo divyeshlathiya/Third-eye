@@ -30,10 +30,16 @@ def can_take_quiz(db: Session, user_id: str) -> bool:
 
     now = datetime.now(timezone.utc)
 
-    if now - last_taken < timedelta(days=1):
-        return False
+    """check if quiz taken time more than 24 hr or not"""
+    # if now - last_taken < timedelta(days=1):
+    #     return False
+
+    """check only last date"""
+    if now.date() == last_taken.date():
+        return False  # Already taken today
 
     return True
+
 
 
 def update_streak(db: Session, user_id: str) -> UserStreak:

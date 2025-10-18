@@ -81,7 +81,7 @@ def get_certificate(user: User = Depends(get_current_user), db: Session = Depend
 
     # Paths
     template_path = "third_eye/Certificate_temp.png"
-    output_path = f"third_eye/{user.id}_certificate.png"
+    output_path = f"third_eye/certificate_downloaded/{user.id}_certificate.png"
 
     # Generate certificate
     output_file = generate_certificate(
