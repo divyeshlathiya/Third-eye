@@ -53,13 +53,13 @@ class _Question1ScreenState extends State<Question1Screen> {
         ];
         texts = [
           "Male Box 0 text here...",
-          "Male Box 1 text here...",
+          "Feeling happy in the moment",
           "Male Box 2 text here...",
           "Male Box 3 text here...",
-          "Male Box 4 text here...",
+          "Neutral, not engaging",
           "Male Box 5 text here...",
           "Male Box 6 text here...",
-          "Male Box 7 text here...",
+          "Feeling sad",
           "Male Box 8 text here...",
         ];
       } else {
@@ -88,15 +88,15 @@ class _Question1ScreenState extends State<Question1Screen> {
         ];
 
         texts = [
-          "Female Box 0 text here...",
-          "Female Box 1 text here...",
-          "Female Box 2 text here...",
-          "Female Box 3 text here...",
-          "Female Box 4 text here...",
-          "Female Box 5 text here...",
-          "Female Box 6 text here...",
-          "Female Box 7 text here...",
-          "Female Box 8 text here...",
+          "Emotional giving from both partners",
+          "Doing exactly what’s needed",
+          "Doing many things out of love",
+          "Thinking good",
+          "Not engaging",
+          "Negative thoughts",
+          "Sad from unfulfilled needs",
+          "Anger and violence",
+          "Emotional separation",
         ];
       }
 
@@ -116,13 +116,17 @@ class _Question1ScreenState extends State<Question1Screen> {
       );
     }
 
+    final String questionText = widget.isMale
+        ? "This is Question 1: Select from 3 boxes"
+        : "This is Question 1: Select from 9 boxes";
+
     return QuestionScreen(
       columnIndex: 0,
       boxImages: images,
       boxTips: tips,
       boxText: texts,
-      questionText: "This is Question 1: Select from 3 boxes",
-      onNext: () {
+      questionText: questionText,
+      onNext: () {  
         Navigator.push(
           context,
           MaterialPageRoute(

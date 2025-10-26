@@ -141,15 +141,15 @@ class _Question2ScreenState extends State<Question2Screen> {
         ];
 
         texts = [
-          "Male Box 0 text here...",
+          "Family is happy because of you",
           "Male Box 1 text here...",
-          "Male Box 2 text here...",
+          "Doing what’s needed",
           "Male Box 3 text here...",
-          "Male Box 4 text here...",
+          "No interaction",
           "Male Box 5 text here...",
-          "Male Box 6 text here...",
+          "Feeling sad due to lack of appreciation",
           "Male Box 7 text here...",
-          "Male Box 8 text here...",
+          "Feeling trapped, angry, or violent",
         ];
       } else {
         images = await Future.wait([
@@ -177,15 +177,15 @@ class _Question2ScreenState extends State<Question2Screen> {
         ];
 
         texts = [
-          "Female Box 0 text here...",
-          "Female Box 1 text here...",
-          "Female Box 2 text here...",
+          "Doing exact things for family",
+          "Doing many things",
+          "Thinking positively",
           "Female Box 3 text here...",
-          "Female Box 4 text here...",
+          "Avoiding interaction with family",
           "Female Box 5 text here...",
-          "Female Box 6 text here...",
-          "Female Box 7 text here...",
-          "Female Box 8 text here...",
+          "Feeling unappreciated",
+          "Sad and ignored",
+          "Feeling trapped with family",
         ];
       }
 
@@ -204,13 +204,15 @@ class _Question2ScreenState extends State<Question2Screen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
+    final String questionText = widget.isMale
+        ? "This is Question 2: Select from 5 boxes"
+        : "This is Question 2: Select from 7 boxes";
     return QuestionScreen(
       columnIndex: 1,
       boxImages: images,
       boxTips: tips,
       boxText: texts,
-      questionText: "This is Question 2: Select from 5 boxes",
+      questionText: questionText,
       onNext: () {
         Navigator.push(
           context,

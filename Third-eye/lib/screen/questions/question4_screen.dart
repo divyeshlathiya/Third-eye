@@ -137,15 +137,15 @@ class _Question4ScreenState extends State<Question4Screen> {
         ];
 
         texts = [
-          "Male Box 0 text here...",
-          "Male Box 1 text here...",
-          "Male Box 2 text here...",
-          "Male Box 3 text here...",
-          "Male Box 4 text here...",
-          "Male Box 5 text here...",
-          "Male Box 6 text here...",
-          "Male Box 7 text here...",
-          "Male Box 8 text here...",
+          "Emotional giving nature from both partners ",
+          "Doing exactly what’s needed",
+          "Doing many things out of love",
+          "Thinking good",
+          "Not engaging ",
+          "Negative thoughts for partner",
+          "Sad from unfulfilled needs",
+          "Anger and violence",
+          "Emotional separation",
         ];
       } else {
         images = await Future.wait([
@@ -174,13 +174,13 @@ class _Question4ScreenState extends State<Question4Screen> {
 
         texts = [
           "Female Box 0 text here...",
-          "Female Box 1 text here...",
+          "Feeling happy in the moment",
           "Female Box 2 text here...",
           "Female Box 3 text here...",
-          "Female Box 4 text here...",
+          "Neutral, not engaging",
           "Female Box 5 text here...",
           "Female Box 6 text here...",
-          "Female Box 7 text here...",
+          "Feeling sad",
           "Female Box 8 text here...",
         ];
       }
@@ -200,13 +200,16 @@ class _Question4ScreenState extends State<Question4Screen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+    final String questionText = widget.isMale
+        ? "This is Question 4: Select from 9 boxes"
+        : "This is Question 4: Select from 3 boxes";
 
     return QuestionScreen(
       columnIndex: 3,
       boxImages: images,
       boxTips: tips,
       boxText: texts,
-      questionText: "This is Question 4: Select from 7 boxes",
+      questionText: questionText,
       onNext: () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Quiz Completed!")),

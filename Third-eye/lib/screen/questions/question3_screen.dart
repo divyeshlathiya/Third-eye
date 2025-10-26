@@ -141,15 +141,15 @@ class _Question3ScreenState extends State<Question3Screen> {
         ];
 
         texts = [
-          "Male Box 0 text here...",
-          "Male Box 1 text here...",
-          "Male Box 2 text here...",
+          "Achievement",
+          "Trying multiple things",
+          "Thinking positively about career",
           "Male Box 3 text here...",
-          "Male Box 4 text here...",
+          "Avoiding to save energy ",
           "Male Box 5 text here...",
-          "Male Box 6 text here...",
-          "Male Box 7 text here...",
-          "Male Box 8 text here...",
+          "Negative thoughts",
+          "Confused and sad",
+          "Angry, disrespected, argumentative",
         ];
       } else {
         images = await Future.wait([
@@ -177,15 +177,15 @@ class _Question3ScreenState extends State<Question3Screen> {
         ];
 
         texts = [
-          "Female Box 0 text here...",
+          "Achieving your goals",
           "Female Box 1 text here...",
-          "Female Box 2 text here...",
+          "Working positively",
           "Female Box 3 text here...",
-          "Female Box 4 text here...",
+          "Taking a break",
           "Female Box 5 text here...",
-          "Female Box 6 text here...",
+          "Negative thoughts",
           "Female Box 7 text here...",
-          "Female Box 8 text here...",
+          "Angry and disrespected",
         ];
       }
 
@@ -205,12 +205,16 @@ class _Question3ScreenState extends State<Question3Screen> {
       );
     }
 
+    final String questionText = widget.isMale
+        ? "This is Question 3: Select from 7 boxes"
+        : "This is Question 3: Select from 5 boxes";
+
     return QuestionScreen(
       columnIndex: 2,
       boxImages: images,
       boxTips: tips,
       boxText: texts,
-      questionText: "This is Question 3: Select from 7 boxes",
+      questionText: questionText,
       onNext: () {
         Navigator.push(
           context,
