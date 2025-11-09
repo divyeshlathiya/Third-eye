@@ -121,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (result != null) {
       CustomSnackBar.showCustomSnackBar(
           context, "Profile updated successfully.");
-      Navigator.pop(context);
+      Navigator.pop(context,true);
     } else {
       CustomSnackBar.showCustomSnackBar(context, "Failed to update profile");
     }

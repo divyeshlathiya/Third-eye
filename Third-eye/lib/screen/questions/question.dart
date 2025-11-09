@@ -326,6 +326,7 @@
 //   }
 // }
 
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -463,20 +464,59 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: widget.boxImages[index].endsWith(".svg")
                               ? SvgPicture.asset(
-                                  widget.boxImages[index],
-                                  width: 200,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.network(
-                                  widget.boxImages[index],
-                                  width: 200,
-                                  height: 200,
-                                  fit: BoxFit.cover,
+                            widget.boxImages[index],
+                            width: 200,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          )
+                              : (() {
+                            final path = widget.boxImages[index];
+
+                            // ✅ Local image (downloaded to device)
+                            if (path.startsWith('/data/') || path.startsWith('/storage/')) {
+                              return Image.file(
+                                File(path),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.white,
                                 ),
+                              );
+                            }
+
+                            // ✅ Network image (Firebase or Supabase)
+                            if (path.startsWith('http')) {
+                              return Image.network(
+                                path,
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.broken_image,
+                                  size: 50,
+                                  color: Colors.white,
+                                ),
+                              );
+                            }
+
+                            // ✅ Asset fallback (from /assets folder)
+                            return Image.asset(
+                              path,
+                              width: 200,
+                              height: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: Colors.white,
+                              ),
+                            );
+                          })(),
                         ),
                       ),
-
                       const SizedBox(height: 12),
                       Text(
                         "Score: $points",
@@ -603,12 +643,15 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                   : 2, // thicker border when selected
                             ),
                             image: DecorationImage(
-                              image: widget.boxImages[index].startsWith("http")
+                              image: widget.boxImages[index].startsWith('/data/') ||
+                                  widget.boxImages[index].startsWith('/storage/')
+                                  ? FileImage(File(widget.boxImages[index]))
+                                  : widget.boxImages[index].startsWith('http')
                                   ? NetworkImage(widget.boxImages[index])
-                                  : AssetImage(widget.boxImages[index])
-                                      as ImageProvider,
+                                  : AssetImage(widget.boxImages[index]) as ImageProvider,
                               fit: BoxFit.cover,
                             ),
+
                           ),
                           child: Align(
                             alignment: Alignment.bottomCenter,

@@ -1,95 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'package:thirdeye/screen/questions/question.dart';
-// import 'question3_screen.dart';
-
-// class Question2Screen extends StatefulWidget {
-//   final bool isMale; // ✅ Add gender flag
-
-//   const Question2Screen({super.key, required this.isMale});
-
-//   @override
-//   State<Question2Screen> createState() => _Question2ScreenState();
-// }
-
-// class _Question2ScreenState extends State<Question2Screen> {
-//   int? selectedBox; // Track which box user clicked
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final maleImages = [
-//       "assets/q2-10.png",
-//       "assets/agna.jpg",
-//       "assets/q2-20.png",
-//       "assets/agna.png",
-//       "assets/q2-0.png",
-//       "assets/agna.png",
-//       "assets/q2-neg10.png",
-//       "assets/agna.jpg",
-//       "assets/q2-neg20.png",
-//     ];
-
-//     final maleTips = [
-//       "Today you're doing great job by identifying what my family want and fullfilled it. Keep it up.",
-//       "Tip for Box 1",
-//       "Today you have done great job on providing the family what needed. But identify what they realy want. When u full fill it it will be more joy in family.",
-//       "Tip for Box 3",
-//       " Not interaction with family to save energy for other things\n\n It is good way to avoid more fight and conflicts.and save energy.But family will save you when u have personal/professional loss. So give more and less expect. So focus on what u can give",
-//       "Tip for Box 5",
-//       " feel sad avoided by family due to not fullfilled some demand.\n\n Don't become sad they are your responsibility.Time will heal. focus mistakes from your side correct it.Focus on breathing to become neutral.",
-//       "Tip for Box 7",
-//       "feel trapped, angry, violent with family\n\n 1.emotional separation by focusing on breath and counting breath holding seconds and air passing through nose. Inhale for eg. 4 sec hold for 4 second exhale for 6 sec.\n\n 2. Avoid interactionUnderstand situation and consequencyIf it is not life or death, them calmly explain them that you are not up to the mark or adequate information and energy for this discussion right now we will discussion soon laterol.\n\n 3. Understand root of your emotionsIf that person is realy important part of your version of family than forgive them and find mistake from your side and apologize because u will always able to forgive you but not others easily. And if not them than reduce your family circle by reducing expectations from them save 20% of energy.",
-//     ];
-
-//     // ✅ Female data (replace with your own)
-//     final femaleImages = [
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//       "assets/agna.png",
-//     ];
-
-//     final femaleTips = [
-//       "Tip for Female Box 0",
-//       "Self-care is important—make time for activities that bring you peace.",
-//       "Tip for Female Box 2",
-//       "Tip for Female Box 3",
-//       "Stay focused on long-term goals, not temporary relief.",
-//       "Tip for Female Box 5",
-//       "Tip for Female Box 6",
-//       "Remember: feelings are temporary, your inner strength is lasting.",
-//       "Tip for Female Box 8",
-//     ];
-
-//     // ✅ Choose based on gender
-//     final images = widget.isMale ? maleImages : femaleImages;
-//     final tips = widget.isMale ? maleTips : femaleTips;
-//     return QuestionScreen(
-//       columnIndex: 1,
-//       boxImages: images,
-//       questionText: "This is Question 2: Select from 5 boxes",
-//       boxTips: tips,
-//       onNext: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//               builder: (_) => Question3Screen(isMale: widget.isMale)),
-//         );
-//       },
-//       onPrevious: () => Navigator.pop(context),
-//       isMale: widget.isMale,
-//     );
-//   }
-// }
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'question3_screen.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:thirdeye/screen/questions/question.dart';
+import 'question3_screen.dart';
 
 class Question2Screen extends StatefulWidget {
   final bool isMale;
@@ -101,7 +15,6 @@ class Question2Screen extends StatefulWidget {
 }
 
 class _Question2ScreenState extends State<Question2Screen> {
-  int? selectedBox;
   late List<String> images;
   late List<String> tips;
   late List<String> texts;
@@ -113,20 +26,35 @@ class _Question2ScreenState extends State<Question2Screen> {
     _loadImages();
   }
 
+  /// ✅ Downloads Firebase images once, caches them locally in app directory
   Future<void> _loadImages() async {
     try {
+      final dir = await getApplicationDocumentsDirectory();
+
       if (widget.isMale) {
-        images = await Future.wait([
-          FirebaseStorage.instance.ref('male/q2-20.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/q2-10.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/q2-0.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/q2-neg10.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('male/q2-neg20.png').getDownloadURL(),
-        ]);
+        final urls = [
+          'male/q2-20.png',
+          'male/agna.png',
+          'male/q2-10.png',
+          'male/agna.png',
+          'male/q2-0.png',
+          'male/agna.png',
+          'male/q2-neg10.png',
+          'male/agna.png',
+          'male/q2-neg20.png',
+        ];
+
+        images = await Future.wait(urls.map((path) async {
+          final localFile = File('${dir.path}/${path.split('/').last}');
+          if (await localFile.exists()) {
+            return localFile.path;
+          } else {
+            final ref = FirebaseStorage.instance.ref(path);
+            final bytes = await ref.getData();
+            if (bytes != null) await localFile.writeAsBytes(bytes);
+            return localFile.path;
+          }
+        }));
 
         tips = [
           "Today you're doing great job by identifying what my family want and fullfilled it. Keep it up.",
@@ -143,7 +71,7 @@ class _Question2ScreenState extends State<Question2Screen> {
         texts = [
           "Family is happy because of you",
           "Male Box 1 text here...",
-          "Doing what’s needed",
+          "Doing what's needed",
           "Male Box 3 text here...",
           "No interaction",
           "Male Box 5 text here...",
@@ -152,17 +80,29 @@ class _Question2ScreenState extends State<Question2Screen> {
           "Feeling trapped, angry, or violent",
         ];
       } else {
-        images = await Future.wait([
-          FirebaseStorage.instance.ref('female/fq2-30.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-20.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-10.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-0.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/agna.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-neg10.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-neg20.png').getDownloadURL(),
-          FirebaseStorage.instance.ref('female/fq2-neg30.png').getDownloadURL(),
-        ]);
+        final urls = [
+          'female/fq2-30.png',
+          'female/fq2-20.png',
+          'female/fq2-10.png',
+          'female/agna.png',
+          'female/fq2-0.png',
+          'female/agna.png',
+          'female/fq2-neg10.png',
+          'female/fq2-neg20.png',
+          'female/fq2-neg30.png',
+        ];
+
+        images = await Future.wait(urls.map((path) async {
+          final localFile = File('${dir.path}/${path.split('/').last}');
+          if (await localFile.exists()) {
+            return localFile.path;
+          } else {
+            final ref = FirebaseStorage.instance.ref(path);
+            final bytes = await ref.getData();
+            if (bytes != null) await localFile.writeAsBytes(bytes);
+            return localFile.path;
+          }
+        }));
 
         tips = [
           "You're at your emotional peak. Your family is emotionally fulfilled.",
@@ -193,7 +133,7 @@ class _Question2ScreenState extends State<Question2Screen> {
         loading = false;
       });
     } catch (e) {
-      debugPrint("Error loading images: $e");
+      debugPrint("❌ Error loading images: $e");
     }
   }
 
@@ -204,24 +144,27 @@ class _Question2ScreenState extends State<Question2Screen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    final String questionText = widget.isMale
+
+    final questionText = widget.isMale
         ? "This is Question 2: Select from 5 boxes"
         : "This is Question 2: Select from 7 boxes";
+
     return QuestionScreen(
       columnIndex: 1,
-      boxImages: images,
+      boxImages: images, // ✅ Local cached paths used here
       boxTips: tips,
       boxText: texts,
       questionText: questionText,
+      isMale: widget.isMale,
       onNext: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) => Question3Screen(isMale: widget.isMale)),
+            builder: (_) => Question3Screen(isMale: widget.isMale),
+          ),
         );
       },
       onPrevious: () => Navigator.pop(context),
-      isMale: widget.isMale,
     );
   }
 }

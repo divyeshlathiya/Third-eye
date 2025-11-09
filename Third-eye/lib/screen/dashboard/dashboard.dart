@@ -642,16 +642,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           },
                           icon: Icon(Icons.refresh_outlined)),
                       IconButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          // 👇 Wait for drawer to return a result
+                          final updated = await Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const MenuDrawer(),
-                            ),
+                            MaterialPageRoute(builder: (context) => const MenuDrawer()),
                           );
+
+                          // 👇 When MenuDrawer pops with true (after profile update)
+                          if (updated == true) {
+                            await _loadUserData(); // reload instantly
+                            setState(() {}); // refresh UI
+                          }
                         },
                         icon: Icon(Icons.menu, size: width * 0.07),
                       ),
+
                     ],
                   ),
                 ),
