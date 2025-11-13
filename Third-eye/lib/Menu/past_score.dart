@@ -172,65 +172,6 @@ class _PastScoresScreenState extends State<PastScoresScreen> {
                     }).toList(),
                   ),
                 ),
-
-                const Spacer(),
-
-                // Buttons
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B2EB0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          onPressed: () {
-                            // ✅ Download logic here
-                          },
-                          icon: const Icon(Icons.download, color: Colors.white),
-                          label: const Text(
-                            "Download",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF3B2EB0)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          onPressed: () {
-                            // ✅ Share logic here
-                          },
-                          icon: const Icon(
-                            Icons.share,
-                            color: Color(0xFF3B2EB0),
-                          ),
-                          label: const Text(
-                            "Share",
-                            style: TextStyle(
-                              color: Color(0xFF3B2EB0),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             );
           },

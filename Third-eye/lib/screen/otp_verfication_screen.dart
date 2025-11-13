@@ -84,53 +84,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
   }
 
-  // void _verifyOtp() async {
-  //   final otp = _otpController.text.trim();
-
-  //   if (otp.isEmpty) {
-  //     if (!mounted) return;
-  //     CustomSnackBar.showCustomSnackBar(context, "Please enter OTP");
-  //     return;
-  //   }
-  //   setState(() => isLoading = true);
-
-  //   try {
-  //     bool validOtp = await _repository.verifyOtp(widget.email, otp, "signup");
-  //     if (!mounted) return;
-  //     if (validOtp) {
-  //       final registered = await _repository.registerUser(widget.user!);
-  //       if (!mounted) return;
-
-  //       if (registered != null) {
-  //         final accessToken = registered["tokens"]["access_token"];
-
-  //         Navigator.push(
-  //             context,
-  //             MaterialPageRoute(
-  //                 builder: (_) => AboutYourSelfScreen(
-  //                       accessToken: accessToken,
-  //                     )));
-  //         // CustomSnackBar.showCustomSnackBar(
-  //         //     context, "User registered successfully");
-  //       } else {
-  //         if (!mounted) return;
-  //         CustomSnackBar.showCustomSnackBar(context, "Error registering user");
-  //       }
-  //     } else {
-  //       if (!mounted) return;
-  //       CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
-  //     }
-  //   } catch (e) {
-  //     if (!mounted) return;
-  //     CustomSnackBar.showCustomSnackBar(
-  //       context,
-  //       "Something went wrong: $e",
-  //     );
-  //   } finally {
-  //     if (mounted) setState(() => isLoading = false);
-  //   }
-  // }
-
   void _resendOtp() async {
     setState(() => isLoading = true);
     try {
