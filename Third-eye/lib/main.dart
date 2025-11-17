@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:thirdeye/screen/splash_screen.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 import 'package:thirdeye/config/app_theme.dart';
-import 'firebase_options.dart'; // if using generated file
+import 'firebase_options.dart'; // you already have this
+import 'notification/firebase_background_handler.dart'; // top-level background handler
+import 'notification/notification_service.dart'; // your NotificationService
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +27,23 @@ void main() async {
     }
   } catch (e) {
     debugPrint("Error initializing Firebase: $e");
+  }
+
+  // Register background message handler BEFORE runApp
+  // firebase_background_handler.dart must contain a top-level function:
+  // Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async { ... }
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Initialize your local notification helper (this also sets up onMessage listeners)
+  // Ensure NotificationService.init() does not depend on BuildContext.
+  try {
+    await NotificationService.instance.init();
+    // Optional: get token and print so you can test from console
+    final token = await NotificationService.instance.getToken();
+    debugPrint(
+        '---------------------- FCM token: $token --------------------------');
+  } catch (e) {
+    debugPrint('NotificationService init error: $e');
   }
 
   final hasSeenOnboarding = await PrefsHelper.hasSeenOnboarding();

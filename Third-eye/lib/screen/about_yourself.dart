@@ -125,12 +125,12 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                asset,
-                width: 20,
-                height: 20,
-              ),
-              const SizedBox(width: 8),
+              // SvgPicture.asset(
+              //   asset,
+              //   width: 20,
+              //   height: 20,
+              // ),
+              // const SizedBox(width: 8),
               Text(
                 gender,
                 style: TextStyle(

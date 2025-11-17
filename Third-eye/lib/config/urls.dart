@@ -1,7 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ConfigURL {
-  // static String get base => "https://third-eye-cs1j.onrender.com/api";
   static String get base => dotenv.env["BASE_URL"] ?? "";
   static String get loginURL => "$base/auth/login";
   static String get signUpURL => "$base/auth/register";

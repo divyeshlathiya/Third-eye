@@ -41,48 +41,52 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC6tuhBPTMG3FmpO_Tl_1qeakmqQUcJF6I',
-    appId: '1:831786695055:web:088e7a123ca6954d8a33fa',
-    messagingSenderId: '831786695055',
-    projectId: 'fir-demo-a6516',
-    authDomain: 'fir-demo-a6516.firebaseapp.com',
-    storageBucket: 'fir-demo-a6516.firebasestorage.app',
-    measurementId: 'G-4YKNX5E9NP',
+    apiKey: 'AIzaSyBj8z2gVZz5qnsfWjmcACw9C7uc2KQwwGs',
+    appId: '1:764937457152:web:99225786732a4d084e92e5',
+    messagingSenderId: '764937457152',
+    projectId: 'thirdeye-emotion-tracker',
+    authDomain: 'thirdeye-emotion-tracker.firebaseapp.com',
+    storageBucket: 'thirdeye-emotion-tracker.firebasestorage.app',
+    measurementId: 'G-BWDNK76V6K',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDb4aF_XVjeIDh4R-4AIAaCwsAvZ1AbiHg',
-    appId: '1:831786695055:android:23409509552f005b8a33fa',
-    messagingSenderId: '831786695055',
-    projectId: 'fir-demo-a6516',
-    storageBucket: 'fir-demo-a6516.firebasestorage.app',
+    apiKey: 'AIzaSyCGovxbmpHue5CY66cPdadDIvH9R_Ccauo',
+    appId: '1:764937457152:android:3dfa07d693cc903e4e92e5',
+    messagingSenderId: '764937457152',
+    projectId: 'thirdeye-emotion-tracker',
+    storageBucket: 'thirdeye-emotion-tracker.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAbvHDkRCibLF_Cy276p1JZyYuni9bd-5o',
-    appId: '1:831786695055:ios:c061c7d2cd6c543d8a33fa',
-    messagingSenderId: '831786695055',
-    projectId: 'fir-demo-a6516',
-    storageBucket: 'fir-demo-a6516.firebasestorage.app',
-    iosBundleId: 'com.example.thirdeye',
+    apiKey: 'AIzaSyAF28NCxzBAPfMPenepiyUH7-7RIm1tqXU',
+    appId: '1:764937457152:ios:96755010717b303a4e92e5',
+    messagingSenderId: '764937457152',
+    projectId: 'thirdeye-emotion-tracker',
+    storageBucket: 'thirdeye-emotion-tracker.firebasestorage.app',
+    androidClientId: '764937457152-sgfnnuo4tna6nsp7r66cdknet7hvrltv.apps.googleusercontent.com',
+    iosClientId: '764937457152-7okch3m67sj7n0un5aafp4k9pce4uaou.apps.googleusercontent.com',
+    iosBundleId: 'com.emotiontracker.thirdeye',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAbvHDkRCibLF_Cy276p1JZyYuni9bd-5o',
-    appId: '1:831786695055:ios:c061c7d2cd6c543d8a33fa',
-    messagingSenderId: '831786695055',
-    projectId: 'fir-demo-a6516',
-    storageBucket: 'fir-demo-a6516.firebasestorage.app',
+    apiKey: 'AIzaSyAF28NCxzBAPfMPenepiyUH7-7RIm1tqXU',
+    appId: '1:764937457152:ios:8112d604d429837f4e92e5',
+    messagingSenderId: '764937457152',
+    projectId: 'thirdeye-emotion-tracker',
+    storageBucket: 'thirdeye-emotion-tracker.firebasestorage.app',
+    androidClientId: '764937457152-sgfnnuo4tna6nsp7r66cdknet7hvrltv.apps.googleusercontent.com',
+    iosClientId: '764937457152-e89iruesk3pim2e4k0i9vp95nkc1drq3.apps.googleusercontent.com',
     iosBundleId: 'com.example.thirdeye',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyC6tuhBPTMG3FmpO_Tl_1qeakmqQUcJF6I',
-    appId: '1:831786695055:web:f7301a2428df313c8a33fa',
-    messagingSenderId: '831786695055',
-    projectId: 'fir-demo-a6516',
-    authDomain: 'fir-demo-a6516.firebaseapp.com',
-    storageBucket: 'fir-demo-a6516.firebasestorage.app',
-    measurementId: 'G-4F63V0RLKW',
+    apiKey: 'AIzaSyBj8z2gVZz5qnsfWjmcACw9C7uc2KQwwGs',
+    appId: '1:764937457152:web:c7abe259dc2a657e4e92e5',
+    messagingSenderId: '764937457152',
+    projectId: 'thirdeye-emotion-tracker',
+    authDomain: 'thirdeye-emotion-tracker.firebaseapp.com',
+    storageBucket: 'thirdeye-emotion-tracker.firebasestorage.app',
+    measurementId: 'G-01HS19RPMB',
   );
 }

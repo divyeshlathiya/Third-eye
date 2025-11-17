@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>764937457152-e89iruesk3pim2e4k0i9vp95nkc1drq3.apps.googleusercontent.com</string>
+	<string>764937457152-7okch3m67sj7n0un5aafp4k9pce4uaou.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.764937457152-e89iruesk3pim2e4k0i9vp95nkc1drq3</string>
+	<string>com.googleusercontent.apps.764937457152-7okch3m67sj7n0un5aafp4k9pce4uaou</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>764937457152-sgfnnuo4tna6nsp7r66cdknet7hvrltv.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAF28NCxzBAPfMPenepiyUH7-7RIm1tqXU</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.thirdeye</string>
+	<string>com.emotiontracker.thirdeye</string>
 	<key>PROJECT_ID</key>
 	<string>thirdeye-emotion-tracker</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:764937457152:ios:8112d604d429837f4e92e5</string>
+	<string>1:764937457152:ios:96755010717b303a4e92e5</string>
 </dict>
 </plist>

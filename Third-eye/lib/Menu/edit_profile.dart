@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+// import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
@@ -121,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (result != null) {
       CustomSnackBar.showCustomSnackBar(
           context, "Profile updated successfully.");
-      Navigator.pop(context,true);
+      Navigator.pop(context, true);
     } else {
       CustomSnackBar.showCustomSnackBar(context, "Failed to update profile");
     }
@@ -148,8 +148,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(asset, width: 20, height: 20),
-              const SizedBox(width: 8),
+              // SvgPicture.asset(asset, width: 20, height: 20),
+              // const SizedBox(width: 8),
               Text(
                 gender,
                 style: const TextStyle(
