@@ -101,16 +101,16 @@ class _Question2ScreenState extends State<Question2Screen> {
         ];
 
         texts = [
-          "Male Box 0 text here...",
           "Family is happy because of you",
-          "Male Box 2 text here...",
+          "Male Box 0 text here...",
           "Doing what's needed",
-          "Male Box 4 text here...",
+          "Male Box 2 text here...",
           "No interaction",
-          "Male Box 6 text here...",
+          "Male Box 4 text here...",
           "Feeling sad due to lack of appreciation",
-          "Male Box 8 text here...",
+          "Male Box 6 text here...",
           "Feeling trapped, angry, or violent",
+          "Male Box 8 text here...",
         ];
       } else {
         tips = [

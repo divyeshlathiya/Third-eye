@@ -8,6 +8,7 @@ import 'package:thirdeye/services/auth_manager.dart';
 import 'package:thirdeye/sharable_widget/index.dart';
 import 'package:thirdeye/config/app_theme.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
+import 'package:thirdeye/utils/validate_helper.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key, required this.email, this.user});
@@ -37,6 +38,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void _verifyOtp() async {
     final otp = _otpController.text.trim();
 
+    if (!Validator.isOtpValid(otp)) {
+      CustomSnackBar.showCustomSnackBar(
+          context, "Please enter a valid 6-digit OTP");
+      return;
+    }
+
     if (otp.isEmpty) {
       if (!mounted) return;
       CustomSnackBar.showCustomSnackBar(context, "Please enter OTP");
@@ -46,7 +53,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     setState(() => isLoading = true);
 
     try {
-      bool validOtp = await _repository.verifyOtp(widget.email, otp, "signup");
+      final otpResult =
+          await _repository.verifyOtp(widget.email, otp, "signup");
+      bool validOtp = otpResult["success"] == true;
       if (!mounted) return;
 
       if (validOtp) {
@@ -87,8 +96,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void _resendOtp() async {
     setState(() => isLoading = true);
     try {
-      bool otpSent =
-          await _repository.sendOtp(_email, "signup"); // purpose can be dynamic
+      final otpResult = await _repository.sendOtp(_email, "signup");
+      bool otpSent = otpResult["success"] == true;
       if (!mounted) return;
 
       if (otpSent) {
@@ -273,7 +282,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   delay: const Duration(milliseconds: 1200),
                   child: PrimaryButton(
                     text: "Verify Code",
-                    icon: const Icon(Icons.verified_user),
+                    icon: const Icon(
+                      Icons.verified_user,
+                      color: Colors.white,
+                    ),
                     onPressed: _verifyOtp,
                     isFullWidth: true,
                   ),

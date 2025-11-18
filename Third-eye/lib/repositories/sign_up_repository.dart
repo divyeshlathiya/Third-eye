@@ -1,24 +1,24 @@
 import 'package:thirdeye/models/User.dart';
-
 import '../services/sign_up_service.dart';
 import '../../utils/storage_helper.dart';
 
 class SignUpRepository {
-  Future<bool> sendOtp(String email, String purpose) async {
+  Future<Map<String, dynamic>> sendOtp(String email, String purpose) async {
     return await SignUpService.sendOtp(email, purpose);
   }
 
-  Future<bool> verifyOtp(String email, String otp, String purpose) async {
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp, String purpose) async {
     return await SignUpService.verifyOtp(email, otp, purpose);
   }
 
-  Future<bool> resetPassword(String email, String newPassword) async {
+  Future<Map<String, dynamic>> resetPassword(String email, String newPassword) async {
     return await SignUpService.resetPassword(email, newPassword);
   }
 
-  Future<Map<String, dynamic>?> registerUser(User user) async {
+  Future<Map<String, dynamic>> registerUser(User user) async {
     final result = await SignUpService.signUpUser(user);
-    if (result != null) {
+    
+    if (result["success"] == true && result["user"] != null) {
       final tokens = result["tokens"];
       final userData = result["user"];
 
@@ -28,10 +28,16 @@ class SignUpRepository {
       await StorageHelper.saveToken('refresh_token', tokens["refresh_token"]);
 
       return {
+        "success": true,
         "user": userData,
         "tokens": tokens,
+        "message": result["message"]
       };
     }
-    return null;
+    
+    return {
+      "success": false,
+      "message": result["message"] ?? "Registration failed"
+    };
   }
 }

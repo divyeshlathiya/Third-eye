@@ -4,7 +4,8 @@ import 'package:thirdeye/config/urls.dart';
 import 'package:thirdeye/models/User.dart';
 
 class SignUpService {
-  static Future<bool> sendOtp(String email, String purpose) async {
+  static Future<Map<String, dynamic>> sendOtp(
+      String email, String purpose) async {
     final url = Uri.parse(ConfigURL.sendOtpURL);
     try {
       final response = await http.post(
@@ -12,14 +13,25 @@ class SignUpService {
         headers: {"Content-Type": "application/json"},
         body: json.encode({"email": email, "purpose": purpose}),
       );
-      return response.statusCode == 200;
+
+      if (response.statusCode == 200) {
+        return {"success": true, "message": "OTP sent successfully"};
+      } else if (response.statusCode == 400) {
+        final data = json.decode(response.body);
+        return {
+          "success": false,
+          "message": data["message"] ?? "User already registered"
+        };
+      } else {
+        return {"success": false, "message": "Failed to send OTP"};
+      }
     } catch (e) {
       print("Send OTP error: $e");
-      return false;
+      return {"success": false, "message": "Network error occurred"};
     }
   }
 
-  static Future<bool> verifyOtp(
+  static Future<Map<String, dynamic>> verifyOtp(
       String email, String otp, String purpose) async {
     final url = Uri.parse(ConfigURL.verifyOtpURL);
     try {
@@ -28,14 +40,21 @@ class SignUpService {
         headers: {"Content-Type": "application/json"},
         body: json.encode({"email": email, "otp": otp, "purpose": purpose}),
       );
-      return response.statusCode == 200;
+
+      if (response.statusCode == 200) {
+        return {"success": true, "message": "OTP verified successfully"};
+      } else {
+        final data = json.decode(response.body);
+        return {"success": false, "message": data["message"] ?? "Invalid OTP"};
+      }
     } catch (e) {
       print("Verify OTP error: $e");
-      return false;
+      return {"success": false, "message": "Network error occurred"};
     }
   }
 
-  static Future<bool> resetPassword(String email, String newPassword) async {
+  static Future<Map<String, dynamic>> resetPassword(
+      String email, String newPassword) async {
     final url = Uri.parse(ConfigURL.resetPassword);
     try {
       final response = await http.post(
@@ -47,38 +66,22 @@ class SignUpService {
         }),
       );
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        return {"success": true, "message": "Password reset successfully"};
+      } else {
+        final data = json.decode(response.body);
+        return {
+          "success": false,
+          "message": data["message"] ?? "Failed to reset password"
+        };
+      }
     } catch (e) {
       print("Reset Password error: $e");
-      return false;
+      return {"success": false, "message": "Network error occurred"};
     }
   }
 
-  // static Future<bool> signUpUser(User user) async {
-  //   final url = Uri.parse(ConfigURL.signUpURL);
-  //   try {
-  //     final response = await http.post(
-  //       url,
-  //       headers: {"Content-Type": "application/json"},
-  //       body: json.encode({
-  //         "first_name": user.firstName,
-  //         "last_name": user.lastName,
-  //         "email": user.email,
-  //         "password": user.password,
-  //       }),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       return true;
-  //     }
-  //     return false;
-  //   } catch (e) {
-  //     print("Sign up error: $e");
-  //     return false;
-  //   }
-  // }.
-
-  static Future<Map<String, dynamic>?> signUpUser(User user) async {
+  static Future<Map<String, dynamic>> signUpUser(User user) async {
     final url = Uri.parse(ConfigURL.signUpURL);
     try {
       final response = await http.post(
@@ -95,14 +98,29 @@ class SignUpService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return {
+          "success": true,
           "user": data["user"],
           "tokens": data["tokens"],
+          "message": "Registration successful"
+        };
+      } else if (response.statusCode == 404 || response.statusCode == 400) {
+        final data = json.decode(response.body);
+        return {
+          "success": false,
+          "message": data["message"] ?? "User already exists with this email"
+        };
+      } else {
+        return {
+          "success": false,
+          "message": "Registration failed. Please try again."
         };
       }
-      return null;
     } catch (e) {
       print("Sign up error: $e");
-      return null;
+      return {
+        "success": false,
+        "message": "Network error occurred. Please check your connection."
+      };
     }
   }
 }

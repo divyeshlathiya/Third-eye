@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomPasswordTextFeild extends StatefulWidget {
-  const CustomPasswordTextFeild(
-      {super.key, required this.controller, this.hintText});
+  const CustomPasswordTextFeild({
+    super.key,
+    required this.controller,
+    this.hintText,
+  });
   final TextEditingController controller;
   final String? hintText;
 

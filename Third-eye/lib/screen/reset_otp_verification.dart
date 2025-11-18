@@ -5,6 +5,7 @@ import 'package:thirdeye/screen/reset_password.dart';
 import 'package:thirdeye/sharable_widget/button.dart';
 import 'package:thirdeye/sharable_widget/snack_bar.dart';
 import 'package:thirdeye/sharable_widget/text_feild.dart';
+import 'package:thirdeye/utils/validate_helper.dart';
 import '../../repositories/sign_up_repository.dart';
 
 class ResetOtpVerificationScreen extends StatefulWidget {
@@ -33,12 +34,21 @@ class _ResetOtpVerificationScreenState
   }
 
   Future<void> _verifyOtp() async {
+    final otp = _otpController.text.trim();
+
+    // Using the bool function correctly
+    if (!Validator.isOtpValid(otp)) {
+      CustomSnackBar.showCustomSnackBar(
+          context, "Please enter a valid 6-digit OTP");
+      return;
+    }
+
     setState(() => isLoading = true);
-    final success =
-        await repo.verifyOtp(widget.email, _otpController.text, "reset");
+
+    final success = await repo.verifyOtp(widget.email, otp, "reset");
     setState(() => isLoading = false);
 
-    if (success && mounted) {
+    if (success["success"] == true && mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -46,15 +56,16 @@ class _ResetOtpVerificationScreenState
         ),
       );
     } else {
-      CustomSnackBar.showCustomSnackBar(context, "Invalid OTP");
+      CustomSnackBar.showCustomSnackBar(
+          context, success["message"] ?? "Invalid OTP");
     }
   }
 
   void _resendOtp() async {
     setState(() => isLoading = true);
     try {
-      bool otpSent =
-          await repo.sendOtp(widget.email, "reset"); // purpose can be dynamic
+      final optResult = await repo.sendOtp(widget.email, "reset");
+      bool otpSent = optResult["success"] == true;
       if (!mounted) return;
 
       if (otpSent) {
@@ -100,6 +111,7 @@ class _ResetOtpVerificationScreenState
         child: Column(
           children: [
             MyTextFeild(
+              keyboardType: TextInputType.number,
               controller: _otpController,
               labelText: "Enter OTP",
             ),
@@ -130,6 +142,24 @@ class _ResetOtpVerificationScreenState
                 Text(
                   _canResend ? "0" : "00:${_secondsRemaining}s",
                   style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.info_outline, size: 16, color: Colors.grey),
+                SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    "If you didn't receive the email, please check your spam folder",
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),

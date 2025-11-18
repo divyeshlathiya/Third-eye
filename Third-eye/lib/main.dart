@@ -5,9 +5,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:thirdeye/screen/splash_screen.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 import 'package:thirdeye/config/app_theme.dart';
-import 'firebase_options.dart'; // you already have this
-import 'notification/firebase_background_handler.dart'; // top-level background handler
-import 'notification/notification_service.dart'; // your NotificationService
+import 'firebase_options.dart'; 
+import 'notification/firebase_background_handler.dart';
+import 'notification/notification_service.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +29,7 @@ void main() async {
     debugPrint("Error initializing Firebase: $e");
   }
 
-  // Register background message handler BEFORE runApp
+  // Register background message handler BEFORE runApp  
   // firebase_background_handler.dart must contain a top-level function:
   // Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async { ... }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);

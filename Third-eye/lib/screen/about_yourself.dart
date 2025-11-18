@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:thirdeye/login_screen.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/screen/verified_screen.dart';
-import 'package:thirdeye/sharable_widget/back_btn.dart';
 import 'package:thirdeye/sharable_widget/index.dart';
 
 class AboutYourSelfScreen extends StatefulWidget {
@@ -150,9 +149,15 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: (){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
-        }, icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ));
+            },
+            icon: Icon(Icons.arrow_back)),
         title: const Text(
           "Tell us about yourself",
           style: TextStyle(fontWeight: FontWeight.bold),

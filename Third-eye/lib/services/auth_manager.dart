@@ -39,16 +39,6 @@ class AuthManager {
     return null; // No valid session, requires login
   }
 
-  /// Login with email/password
-  // Future<bool> login(String email, String password) async {
-  //   final success = await _authRepo.login(email, password);
-  //   if (success) {
-  //     final accessToken = await _authRepo.getAccessToken();
-  //     if (accessToken != null) _startAutoRefresh(accessToken);
-  //   }
-  //   return success;
-  // }
-
   Future<bool> login(String email, String password) async {
     final result = await _authRepo.login(email, password);
 

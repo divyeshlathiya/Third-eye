@@ -447,12 +447,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => isLoading = true);
 
     try {
-      // Load from storage
       final profile = await _profileRepository.fetchProfile();
       final name = profile?["first_name"];
       final pic = profile?["profile_pic"];
 
-      // Load scores
       final scoreData = await _scoreRepository.fetchScore();
       final scores = scoreData?['scores'] as List<dynamic>? ?? [];
       final past =
@@ -504,8 +502,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _showRulesDialog() {
     showDialog(
       context: context,
-      barrierDismissible:
-          true, // 👉 set false if you don’t want dismiss outside
+      barrierDismissible: true,
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -570,6 +567,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        top: true,
         child: RefreshIndicator(
           onRefresh: () async {
             await _loadUserData();
@@ -601,7 +599,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ? Image.network(
                                     profilePicUrl!,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
+                                    errorBuilder: (context, error,
+                                            stackTrace) =>
                                         Icon(Icons.person, size: width * 0.07),
                                   )
                                 : Icon(Icons.person, size: width * 0.07),
@@ -622,8 +621,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ? const SizedBox(
                                     height: 16,
                                     width: 16,
-                                    child:
-                                        CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   )
                                 : Text(
                                     firstName ?? "User",
@@ -636,18 +635,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                         const Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              _loadUserData();
-                              _checkQuizAvailability();
-                            },
-                            icon: Icon(Icons.refresh_outlined)),
+                        // IconButton(
+                        //     onPressed: () {
+                        //       _loadUserData();
+                        //       _checkQuizAvailability();
+                        //     },
+                        //     icon: Icon(Icons.refresh_outlined)),
                         IconButton(
                           onPressed: () async {
                             // 👇 Wait for drawer to return a result
                             final updated = await Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const MenuDrawer()),
+                              MaterialPageRoute(
+                                  builder: (context) => const MenuDrawer()),
                             );
 
                             // 👇 When MenuDrawer pops with true (after profile update)
@@ -658,7 +658,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           },
                           icon: Icon(Icons.menu, size: width * 0.07),
                         ),
-
                       ],
                     ),
                   ),
@@ -751,11 +750,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ? _showRulesDialog
                                 : null, // ✅ changed
                             child: Text(
-                              isQuizAvailable ? "Start Quiz" : "Come back tomorrow",
+                              isQuizAvailable
+                                  ? "Start Quiz"
+                                  : "Come back tomorrow",
                               style: TextStyle(
                                 color: isQuizAvailable
-                                    ? const Color(0xFF4B1FA1)   // Purple for "Start Quiz"
-                                    : Colors.white,             // White for "Come back tomorrow"
+                                    ? const Color(
+                                        0xFF4B1FA1) // Purple for "Start Quiz"
+                                    : Colors
+                                        .white, // White for "Come back tomorrow"
                                 fontSize: width * 0.045,
                                 fontWeight: FontWeight.w600,
                               ),

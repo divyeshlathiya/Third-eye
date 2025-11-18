@@ -101,6 +101,7 @@ class _EnhancedInputFieldState extends State<EnhancedInputField>
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return FadeInUp(
@@ -114,18 +115,20 @@ class _EnhancedInputFieldState extends State<EnhancedInputField>
                 Text(
                   widget.label!,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: _isFocused ? AppTheme.primaryColor : AppTheme.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                        color: _isFocused
+                            ? AppTheme.primaryColor
+                            : AppTheme.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
                 if (widget.isRequired) ...[
                   const SizedBox(width: 4),
                   Text(
                     '*',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.errorColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: AppTheme.errorColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ],
               ],
@@ -154,33 +157,40 @@ class _EnhancedInputFieldState extends State<EnhancedInputField>
                   onFieldSubmitted: widget.onSubmitted,
                   validator: widget.validator,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: widget.enabled ? AppTheme.textPrimary : AppTheme.textTertiary,
-                  ),
+                        color: widget.enabled
+                            ? AppTheme.textPrimary
+                            : AppTheme.textTertiary,
+                      ),
                   decoration: InputDecoration(
                     hintText: widget.hint,
                     hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textTertiary,
-                    ),
+                          color: AppTheme.textTertiary,
+                        ),
                     prefixIcon: widget.prefixIcon,
                     suffixIcon: _buildSuffixIcon(),
                     filled: true,
                     fillColor: widget.fillColor ?? AppTheme.cardColor,
                     contentPadding: widget.contentPadding ??
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
                       borderSide: BorderSide(
-                        color: _isFocused ? AppTheme.primaryColor : AppTheme.dividerColor,
+                        color: _isFocused
+                            ? AppTheme.primaryColor
+                            : AppTheme.dividerColor,
                         width: _isFocused ? 2.0 : 1.0,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
-                      borderSide: const BorderSide(color: AppTheme.dividerColor),
+                      borderSide:
+                          const BorderSide(color: AppTheme.dividerColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
-                      borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                      borderSide: const BorderSide(
+                          color: AppTheme.primaryColor, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -188,16 +198,18 @@ class _EnhancedInputFieldState extends State<EnhancedInputField>
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
-                      borderSide: const BorderSide(color: AppTheme.errorColor, width: 2),
+                      borderSide: const BorderSide(
+                          color: AppTheme.errorColor, width: 2),
                     ),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(widget.borderRadius),
-                      borderSide: BorderSide(color: AppTheme.dividerColor.withOpacity(0.5)),
+                      borderSide: BorderSide(
+                          color: AppTheme.dividerColor.withOpacity(0.5)),
                     ),
                     errorText: widget.errorText,
                     errorStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.errorColor,
-                    ),
+                          color: AppTheme.errorColor,
+                        ),
                     counterText: '',
                   ),
                 ),
@@ -239,7 +251,8 @@ class EmailInputField extends EnhancedInputField {
     super.isRequired = true,
   }) : super(
           keyboardType: TextInputType.emailAddress,
-          prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.textSecondary),
+          prefixIcon:
+              const Icon(Icons.email_outlined, color: AppTheme.textSecondary),
         );
 }
 
@@ -254,7 +267,8 @@ class PasswordInputField extends EnhancedInputField {
     super.isRequired = true,
   }) : super(
           obscureText: true,
-          prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.textSecondary),
+          prefixIcon:
+              const Icon(Icons.lock_outline, color: AppTheme.textSecondary),
         );
 }
 
@@ -269,7 +283,8 @@ class PhoneInputField extends EnhancedInputField {
     super.isRequired = true,
   }) : super(
           keyboardType: TextInputType.phone,
-          prefixIcon: const Icon(Icons.phone_outlined, color: AppTheme.textSecondary),
+          prefixIcon:
+              const Icon(Icons.phone_outlined, color: AppTheme.textSecondary),
         );
 }
 
@@ -282,6 +297,7 @@ class SearchInputField extends EnhancedInputField {
     super.onSubmitted,
   }) : super(
           prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
-          suffixIcon: const Icon(Icons.filter_list, color: AppTheme.textSecondary),
+          suffixIcon:
+              const Icon(Icons.filter_list, color: AppTheme.textSecondary),
         );
 }
