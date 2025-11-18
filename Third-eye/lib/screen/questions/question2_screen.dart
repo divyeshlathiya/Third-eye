@@ -155,8 +155,8 @@ class _Question2ScreenState extends State<Question2Screen> {
     }
 
     final String questionText = widget.isMale
-        ? "This is Question 2: Select from 5 boxes"
-        : "This is Question 2: Select from 7 boxes";
+        ? "Select from 5 boxes"
+        : "Select from 7 boxes";
 
     return QuestionScreen(
       columnIndex: 1,

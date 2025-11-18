@@ -288,7 +288,7 @@ class _SignupformState extends State<Signupform> {
                   delay: const Duration(milliseconds: 1200),
                   child: PrimaryButton(
                     text: "Create Account",
-                    icon: const Icon(Icons.person_add),
+                    icon: const Icon(Icons.person_add,color: Colors.white,),
                     onPressed: _createAccount,
                     isFullWidth: true,
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:thirdeye/login_screen.dart';
 import 'package:thirdeye/repositories/profile_repositories.dart';
 import 'package:thirdeye/screen/verified_screen.dart';
 import 'package:thirdeye/sharable_widget/back_btn.dart';
@@ -149,7 +150,9 @@ class _AboutYourSelfScreenState extends State<AboutYourSelfScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const MyBackButton(),
+        leading: IconButton(onPressed: (){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
+        }, icon: Icon(Icons.arrow_back)),
         title: const Text(
           "Tell us about yourself",
           style: TextStyle(fontWeight: FontWeight.bold),

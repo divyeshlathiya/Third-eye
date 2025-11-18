@@ -153,8 +153,8 @@ class _Question3ScreenState extends State<Question3Screen> {
     }
 
     final String questionText = widget.isMale
-        ? "This is Question 3: Select from 7 boxes"
-        : "This is Question 3: Select from 5 boxes";
+        ? "Select from 7 boxes"
+        : "Select from 5 boxes";
 
     return QuestionScreen(
       columnIndex: 2,

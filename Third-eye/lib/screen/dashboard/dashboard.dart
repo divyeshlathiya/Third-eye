@@ -751,11 +751,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ? _showRulesDialog
                                 : null, // ✅ changed
                             child: Text(
-                              isQuizAvailable
-                                  ? "Start Quiz"
-                                  : "Come back tomorrow",
+                              isQuizAvailable ? "Start Quiz" : "Come back tomorrow",
                               style: TextStyle(
-                                color: const Color(0xFF4B1FA1),
+                                color: isQuizAvailable
+                                    ? const Color(0xFF4B1FA1)   // Purple for "Start Quiz"
+                                    : Colors.white,             // White for "Come back tomorrow"
                                 fontSize: width * 0.045,
                                 fontWeight: FontWeight.w600,
                               ),

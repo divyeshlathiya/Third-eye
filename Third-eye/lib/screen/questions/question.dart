@@ -413,14 +413,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to update score")),
+          const SnackBar(content: Text("Oops! you already attempted the quiz")),
         );
       }
     } catch (e) {
       debugPrint("❌ Error saving score: $e");
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong")),
+        const SnackBar(content: Text("Something went wrong"),backgroundColor: Colors.purple,),
       );
     }
   }
@@ -606,7 +606,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   const SizedBox(height: 12),
                   Text(
                     widget.questionText,
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87,fontWeight:FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.08),

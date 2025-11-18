@@ -435,7 +435,7 @@ class _LoginformState extends State<Loginform> {
                 delay: const Duration(milliseconds: 800),
                 child: PrimaryButton(
                   text: "Sign In",
-                  icon: Icon(Icons.login),
+                  icon: Icon(Icons.login,color: Colors.white,),
                   onPressed: login,
                   isFullWidth: true,
                 ),
