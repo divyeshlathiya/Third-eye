@@ -139,8 +139,22 @@ class _Question1ScreenState extends State<Question1Screen> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/rocket.gif',
+                width: 180,
+                height: 180,
+              ),
+              const SizedBox(height: 16), // Add some spacing
+              const Text("Question is loading...",style: TextStyle(fontWeight: FontWeight.bold),)
+            ],
+          ),
+        )
       );
     }
 

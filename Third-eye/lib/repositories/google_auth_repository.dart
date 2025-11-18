@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:thirdeye/config/urls.dart';
 import 'package:thirdeye/services/google_auth_service.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
@@ -57,6 +58,46 @@ class GoogleAuthRepository {
       }
     } catch (e) {
       print("GoogleAuthRepository Error: $e");
+      return null;
+    }
+  }
+
+  // Simple method with loader - call this from your UI
+  Future<Map<String, dynamic>?> signInWithGoogleWithLoader(BuildContext context) async {
+    // Show loader
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Call your existing method
+      final result = await signInWithGoogle();
+
+      // Hide loader
+      Navigator.of(context).pop();
+
+      return result;
+    } catch (e) {
+      // Hide loader in case of error too
+      Navigator.of(context).pop();
       return null;
     }
   }

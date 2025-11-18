@@ -177,7 +177,9 @@ class _WellnessScreenState extends State<WellnessScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       minimumSize: const Size.fromHeight(50),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => Question1Screen(isMale: widget.isMale),));
+                    },
                     child: const Text(
                       'Continue',
                       style: TextStyle(fontSize: 16, color: Colors.white),

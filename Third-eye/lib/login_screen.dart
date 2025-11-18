@@ -220,8 +220,77 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final AuthManager _authManager = AuthManager();
 
+  // void _googleLogin() async {
+  //   final userData = await _authManager.signInWithGoogle();
+  //
+  //   if (userData != null) {
+  //     final accessToken = userData["access_token"];
+  //     final firstName = userData['first_name'] ?? "User";
+  //
+  //     await StorageHelper.saveToken("access_token", accessToken);
+  //
+  //     if (!mounted) return;
+  //
+  //     final dob = userData['dob'];
+  //     final gender = userData['gender'];
+  //
+  //     if (dob == null || gender == null) {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (_) => AboutYourSelfScreen(accessToken: accessToken),
+  //         ),
+  //       );
+  //     } else {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const DashboardScreen()),
+  //       );
+  //       CustomSnackBar.showCustomSnackBar(
+  //         context,
+  //         "Welcome $firstName",
+  //         backgroundColor: Colors.purple,
+  //       );
+  //     }
+  //   } else {
+  //     CustomSnackBar.showCustomSnackBar(
+  //       context,
+  //       "Google Sign-In failed",
+  //       backgroundColor: Colors.red,
+  //     );
+  //   }
+  // }
+
   void _googleLogin() async {
+    // Show loader immediately when button is pressed
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
     final userData = await _authManager.signInWithGoogle();
+
+    // Hide loader before processing the result
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (userData != null) {
       final accessToken = userData["access_token"];
