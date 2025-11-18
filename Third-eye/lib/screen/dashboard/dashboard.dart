@@ -569,234 +569,236 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _loadUserData();
-          await _checkQuizAvailability();
-        },
-        child: Column(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: height * 0.02),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await _loadUserData();
+            await _checkQuizAvailability();
+          },
+          child: Column(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: height * 0.02),
 
-                // Top content
-                Padding(
-                  padding: EdgeInsets.all(width * 0.04),
-                  child: Row(
-                    children: [
-                      // Profile pic
-                      Container(
-                        width: width * 0.12,
-                        height: width * 0.12,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
+                  // Top content
+                  Padding(
+                    padding: EdgeInsets.all(width * 0.04),
+                    child: Row(
+                      children: [
+                        // Profile pic
+                        Container(
+                          width: width * 0.12,
+                          height: width * 0.12,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: ClipOval(
+                            child: profilePicUrl != null &&
+                                    profilePicUrl!.isNotEmpty
+                                ? Image.network(
+                                    profilePicUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Icon(Icons.person, size: width * 0.07),
+                                  )
+                                : Icon(Icons.person, size: width * 0.07),
+                          ),
                         ),
-                        child: ClipOval(
-                          child: profilePicUrl != null &&
-                                  profilePicUrl!.isNotEmpty
-                              ? Image.network(
-                                  profilePicUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.person, size: width * 0.07),
-                                )
-                              : Icon(Icons.person, size: width * 0.07),
+                        SizedBox(width: width * 0.03),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _getGreeting(),
+                              style: TextStyle(
+                                fontSize: width * 0.03,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            isLoading
+                                ? const SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child:
+                                        CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Text(
+                                    firstName ?? "User",
+                                    style: TextStyle(
+                                      fontSize: width * 0.04,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                          ],
                         ),
+                        const Spacer(),
+                        IconButton(
+                            onPressed: () {
+                              _loadUserData();
+                              _checkQuizAvailability();
+                            },
+                            icon: Icon(Icons.refresh_outlined)),
+                        IconButton(
+                          onPressed: () async {
+                            // 👇 Wait for drawer to return a result
+                            final updated = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const MenuDrawer()),
+                            );
+
+                            // 👇 When MenuDrawer pops with true (after profile update)
+                            if (updated == true) {
+                              await _loadUserData(); // reload instantly
+                              setState(() {}); // refresh UI
+                            }
+                          },
+                          icon: Icon(Icons.menu, size: width * 0.07),
+                        ),
+
+                      ],
+                    ),
+                  ),
+
+                  // Banner Card
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: width * 0.02),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: SvgPicture.asset(
+                        "assets/Card.svg",
+                        fit: BoxFit.fitWidth,
+                        width: double.infinity,
+                        height: height * 0.12,
                       ),
-                      SizedBox(width: width * 0.03),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _getGreeting(),
+                    ),
+                  ),
+
+                  SizedBox(height: height * 0.02),
+                ],
+              ),
+
+              // Expanded Purple container
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF1d0e6b),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(32),
+                      topRight: Radius.circular(32),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(width * 0.05),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(height: 16),
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
                             style: TextStyle(
-                              fontSize: width * 0.03,
-                              color: Colors.grey,
+                              color: Colors.white,
+                              fontSize: width * 0.045,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              const TextSpan(text: "Start Your "),
+                              TextSpan(
+                                text: "21-Days",
+                                style: const TextStyle(
+                                  color: Color(0xFFad9dff),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const TextSpan(
+                                  text:
+                                      " journey to\nBoost mental clarity & Emotional wellness."),
+                            ],
+                          ),
+                        ),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.asset("assets/agna.png"),
+                            Text(
+                              "${streakCount ?? 0}/21",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isQuizAvailable
+                                  ? Colors.white
+                                  : Colors.grey.shade400,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
+                            onPressed: isQuizAvailable
+                                ? _showRulesDialog
+                                : null, // ✅ changed
+                            child: Text(
+                              isQuizAvailable
+                                  ? "Start Quiz"
+                                  : "Come back tomorrow",
+                              style: TextStyle(
+                                color: const Color(0xFF4B1FA1),
+                                fontSize: width * 0.045,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                          isLoading
-                              ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : Text(
-                                  firstName ?? "User",
-                                  style: TextStyle(
-                                    fontSize: width * 0.04,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      const Spacer(),
-                      IconButton(
-                          onPressed: () {
-                            _loadUserData();
-                            _checkQuizAvailability();
-                          },
-                          icon: Icon(Icons.refresh_outlined)),
-                      IconButton(
-                        onPressed: () async {
-                          // 👇 Wait for drawer to return a result
-                          final updated = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MenuDrawer()),
-                          );
-
-                          // 👇 When MenuDrawer pops with true (after profile update)
-                          if (updated == true) {
-                            await _loadUserData(); // reload instantly
-                            setState(() {}); // refresh UI
-                          }
-                        },
-                        icon: Icon(Icons.menu, size: width * 0.07),
-                      ),
-
-                    ],
-                  ),
-                ),
-
-                // Banner Card
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.02),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: SvgPicture.asset(
-                      "assets/Card.svg",
-                      fit: BoxFit.fitWidth,
-                      width: double.infinity,
-                      height: height * 0.12,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: _buildScoreCard(
+                                context,
+                                title: "Score",
+                                value: latestScore?.toString() ?? "--",
+                                icon: Icons.emoji_events,
+                              ),
+                            ),
+                            Expanded(
+                              child: _buildScoreCard(
+                                context,
+                                title: "View Past Score",
+                                value: pastScore?.toString() ?? "--",
+                                icon: Icons.history,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PastScoresScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                      ],
                     ),
                   ),
                 ),
-
-                SizedBox(height: height * 0.02),
-              ],
-            ),
-
-            // Expanded Purple container
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1d0e6b),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(width * 0.05),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(height: 16),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: width * 0.045,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          children: [
-                            const TextSpan(text: "Start Your "),
-                            TextSpan(
-                              text: "21-Days",
-                              style: const TextStyle(
-                                color: Color(0xFFad9dff),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const TextSpan(
-                                text:
-                                    " journey to\nBoost mental clarity & Emotional wellness."),
-                          ],
-                        ),
-                      ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.asset("assets/agna.png"),
-                          Text(
-                            "${streakCount ?? 0}/21",
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isQuizAvailable
-                                ? Colors.white
-                                : Colors.grey.shade400,
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          onPressed: isQuizAvailable
-                              ? _showRulesDialog
-                              : null, // ✅ changed
-                          child: Text(
-                            isQuizAvailable
-                                ? "Start Quiz"
-                                : "Come back tomorrow",
-                            style: TextStyle(
-                              color: const Color(0xFF4B1FA1),
-                              fontSize: width * 0.045,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: _buildScoreCard(
-                              context,
-                              title: "Score",
-                              value: latestScore?.toString() ?? "--",
-                              icon: Icons.emoji_events,
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildScoreCard(
-                              context,
-                              title: "View Past Score",
-                              value: pastScore?.toString() ?? "--",
-                              icon: Icons.history,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PastScoresScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

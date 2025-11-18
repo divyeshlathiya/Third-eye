@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 import 'package:thirdeye/screen/questions/question.dart';
 
 class Question4Screen extends StatefulWidget {
@@ -14,6 +15,7 @@ class Question4Screen extends StatefulWidget {
 }
 
 class _Question4ScreenState extends State<Question4Screen> {
+  int? selectedBox;
   late List<String> images;
   late List<String> tips;
   late List<String> texts;
@@ -22,39 +24,68 @@ class _Question4ScreenState extends State<Question4Screen> {
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadImages(); // Load from local storage or Firebase
   }
 
-  /// ✅ Downloads Firebase images once, caches them locally in app directory
+  /// ✅ Load and cache images locally (downloads only once)
   Future<void> _loadImages() async {
     try {
-      final dir = await getApplicationDocumentsDirectory();
+      final appDir = await getApplicationDocumentsDirectory();
+      final dio = Dio();
+      final List<String> localPaths = [];
 
-      if (widget.isMale) {
-        final urls = [
-          'male/q4-40.jpg',
-          'male/q4-30.png',
-          'male/q4-20.png',
-          'male/q4-10.png',
-          'male/q4-0.png',
-          'male/q4-neg10.png',
-          'male/q4-neg20.png',
-          'male/q4-neg30.png',
-          'male/q4-neg40.png',
-        ];
+      // 🔹 Define Firebase Storage references
+      List<String> refs = widget.isMale
+          ? [
+        'male/q4-40.jpg',
+        'male/q4-30.png',
+        'male/q4-20.png',
+        'male/q4-10.png',
+        'male/q4-0.png',
+        'male/q4-neg10.png',
+        'male/q4-neg20.png',
+        'male/q4-neg30.png',
+        'male/q4-neg40.png',
+      ]
+          : [
+        'female/agna.png',
+        'female/fq4-10.png',
+        'female/agna.png',
+        'female/agna.png',
+        'female/fq4-0.png',
+        'female/agna.png',
+        'female/agna.png',
+        'female/fq4-neg10.png',
+        'female/agna.png',
+      ];
 
-        images = await Future.wait(urls.map((path) async {
-          final localFile = File('${dir.path}/${path.split('/').last}');
-          if (await localFile.exists()) {
-            return localFile.path;
-          } else {
-            final ref = FirebaseStorage.instance.ref(path);
-            final bytes = await ref.getData();
-            if (bytes != null) await localFile.writeAsBytes(bytes);
-            return localFile.path;
+      // 🔹 Download or use cached image files
+      for (String refPath in refs) {
+        final fileName = refPath.split('/').last;
+        final localFile = File('${appDir.path}/$fileName');
+
+        if (await localFile.exists()) {
+          // ✅ Use cached version
+          localPaths.add(localFile.path);
+        } else {
+          // ⬇️ Download and save to local storage
+          try {
+            final url = await FirebaseStorage.instance.ref(refPath).getDownloadURL();
+            await dio.download(url, localFile.path);
+            localPaths.add(localFile.path);
+          } catch (e) {
+            debugPrint("❌ Error downloading $refPath: $e");
+            // Add a placeholder or handle missing images
+            localPaths.add(localFile.path); // Will use the path even if download failed
           }
-        }));
+        }
+      }
 
+      // 🔹 Assign to image list
+      images = localPaths;
+
+      // 🔹 Define text + tips
+      if (widget.isMale) {
         tips = [
           "Emotional entanglement of giving each other.\n\nTip-This is highest form of emotional entanglement with your partner in which both are trying to give what other partner needs rather than asking or seeking from each other.This is deep strong powerfull feeling that creates very deep memory.Every one who is in love desire for it.\n\nKeep it up and give without expectations (Unconditional love)",
           "Doing exact things that needed to be done.\n\nTip- you are doing exactly things that needed to be done for your partner. That's great keep doing it without expectations get rhym with your partner. Your partner will feel bleesed secure and satisfy around you and over period of time Your partner will get emotionally attached with you.",
@@ -68,41 +99,17 @@ class _Question4ScreenState extends State<Question4Screen> {
         ];
 
         texts = [
-          "Emotional giving nature from both partners ",
+          "Emotional giving nature from both partners",
           "Doing exactly what's needed",
           "Doing many things out of love",
           "Thinking good",
-          "Not engaging ",
+          "Not engaging",
           "Negative thoughts for partner",
           "Sad from unfulfilled needs",
           "Anger and violence",
           "Emotional separation",
         ];
       } else {
-        final urls = [
-          'female/agna.png',
-          'female/fq4-10.png',
-          'female/agna.png',
-          'female/agna.png',
-          'female/fq4-0.png',
-          'female/agna.png',
-          'female/agna.png',
-          'female/fq4-neg10.png',
-          'female/agna.png',
-        ];
-
-        images = await Future.wait(urls.map((path) async {
-          final localFile = File('${dir.path}/${path.split('/').last}');
-          if (await localFile.exists()) {
-            return localFile.path;
-          } else {
-            final ref = FirebaseStorage.instance.ref(path);
-            final bytes = await ref.getData();
-            if (bytes != null) await localFile.writeAsBytes(bytes);
-            return localFile.path;
-          }
-        }));
-
         tips = [
           "Tip for Box 0",
           "Short term happiness is easy to gain reapetable,affordable and survival in deep pai but not to get addict.It can waste time energy.",
@@ -128,11 +135,11 @@ class _Question4ScreenState extends State<Question4Screen> {
         ];
       }
 
-      setState(() {
-        loading = false;
-      });
+      setState(() => loading = false);
     } catch (e) {
       debugPrint("❌ Error loading images: $e");
+      // Handle error state appropriately
+      setState(() => loading = false);
     }
   }
 
@@ -144,23 +151,23 @@ class _Question4ScreenState extends State<Question4Screen> {
       );
     }
 
-    final questionText = widget.isMale
+    final String questionText = widget.isMale
         ? "This is Question 4: Select from 9 boxes"
         : "This is Question 4: Select from 3 boxes";
 
     return QuestionScreen(
       columnIndex: 3,
-      boxImages: images, // ✅ Local cached paths used here
+      boxImages: images,
       boxTips: tips,
       boxText: texts,
       questionText: questionText,
-      isMale: widget.isMale,
       onNext: () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Quiz Completed!")),
         );
       },
       onPrevious: () => Navigator.pop(context),
+      isMale: widget.isMale,
     );
   }
 }

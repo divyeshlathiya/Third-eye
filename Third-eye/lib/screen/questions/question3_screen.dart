@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 import 'package:thirdeye/screen/questions/question.dart';
 import 'question4_screen.dart';
 
@@ -15,6 +16,7 @@ class Question3Screen extends StatefulWidget {
 }
 
 class _Question3ScreenState extends State<Question3Screen> {
+  int? selectedBox;
   late List<String> images;
   late List<String> tips;
   late List<String> texts;
@@ -23,39 +25,68 @@ class _Question3ScreenState extends State<Question3Screen> {
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadImages(); // Load from local storage or Firebase
   }
 
-  /// ✅ Downloads Firebase images once, caches them locally in app directory
+  /// ✅ Load and cache images locally (downloads only once)
   Future<void> _loadImages() async {
     try {
-      final dir = await getApplicationDocumentsDirectory();
+      final appDir = await getApplicationDocumentsDirectory();
+      final dio = Dio();
+      final List<String> localPaths = [];
 
-      if (widget.isMale) {
-        final urls = [
-          'male/q3-30.png',
-          'male/q3-20.png',
-          'male/q3-10.png',
-          'male/agna.png',
-          'male/q3-0.png',
-          'male/agna.png',
-          'male/q3-neg10.png',
-          'male/q3-neg20.png',
-          'male/q3-neg30.png',
-        ];
+      // 🔹 Define Firebase Storage references
+      List<String> refs = widget.isMale
+          ? [
+        'male/q3-30.png',
+        'male/q3-20.png',
+        'male/q3-10.png',
+        'male/agna.png',
+        'male/q3-0.png',
+        'male/agna.png',
+        'male/q3-neg10.png',
+        'male/q3-neg20.png',
+        'male/q3-neg30.png',
+      ]
+          : [
+        'female/fq3-20.png',
+        'female/agna.png',
+        'female/fq3-10.png',
+        'female/agna.png',
+        'female/fq3-0.png',
+        'female/agna.png',
+        'female/fq3-neg10.png',
+        'female/agna.png',
+        'female/fq3-neg20.png',
+      ];
 
-        images = await Future.wait(urls.map((path) async {
-          final localFile = File('${dir.path}/${path.split('/').last}');
-          if (await localFile.exists()) {
-            return localFile.path;
-          } else {
-            final ref = FirebaseStorage.instance.ref(path);
-            final bytes = await ref.getData();
-            if (bytes != null) await localFile.writeAsBytes(bytes);
-            return localFile.path;
+      // 🔹 Download or use cached image files
+      for (String refPath in refs) {
+        final fileName = refPath.split('/').last;
+        final localFile = File('${appDir.path}/$fileName');
+
+        if (await localFile.exists()) {
+          // ✅ Use cached version
+          localPaths.add(localFile.path);
+        } else {
+          // ⬇️ Download and save to local storage
+          try {
+            final url = await FirebaseStorage.instance.ref(refPath).getDownloadURL();
+            await dio.download(url, localFile.path);
+            localPaths.add(localFile.path);
+          } catch (e) {
+            debugPrint("❌ Error downloading $refPath: $e");
+            // Add a placeholder or handle missing images
+            localPaths.add(localFile.path); // Will use the path even if download failed
           }
-        }));
+        }
+      }
 
+      // 🔹 Assign to image list
+      images = localPaths;
+
+      // 🔹 Define text + tips
+      if (widget.isMale) {
         tips = [
           "Achievement in Carrier\n\n Tip- as male career is 2nd most important powerfull emotional layer of achievments in career Keep identifying the exact things that needed to be done for career.",
           "Trying many things to achieve goal.\n\n Tip - doing many things for career keep you good position emotional state. Try to identify the things which is needed to be done and plan for it.When your why you do this will clear,how will u do will become easy.",
@@ -73,46 +104,22 @@ class _Question3ScreenState extends State<Question3Screen> {
           "Trying multiple things",
           "Thinking positively about career",
           "Male Box 3 text here...",
-          "Avoiding to save energy ",
+          "Avoiding to save energy",
           "Male Box 5 text here...",
           "Negative thoughts",
           "Confused and sad",
           "Angry, disrespected, argumentative",
         ];
       } else {
-        final urls = [
-          'female/fq3-20.png',
-          'female/agna.png',
-          'female/fq3-10.png',
-          'female/agna.png',
-          'female/fq3-0.png',
-          'female/agna.png',
-          'female/fq3-neg10.png',
-          'female/agna.png',
-          'female/fq3-neg20.png',
-        ];
-
-        images = await Future.wait(urls.map((path) async {
-          final localFile = File('${dir.path}/${path.split('/').last}');
-          if (await localFile.exists()) {
-            return localFile.path;
-          } else {
-            final ref = FirebaseStorage.instance.ref(path);
-            final bytes = await ref.getData();
-            if (bytes != null) await localFile.writeAsBytes(bytes);
-            return localFile.path;
-          }
-        }));
-
         tips = [
           "You are aligned with your purpose.Keep it up.",
-          "box 1 tip",
+          "Tip for Female Box 1",
           "Doing meaningful work increases self-worth.",
-          "box 3 tip",
+          "Tip for Female Box 3",
           "Good. You're focusing on what's more important right now.",
           "Tip for Female Box 5",
           "Identify the root. It could be job fit pressure, or exhaustion.",
-          "box 7 tip",
+          "Tip for Female Box 7",
           "Ask yourself what's truly important Take a pause. Explore other layers of energy.",
         ];
 
@@ -129,11 +136,11 @@ class _Question3ScreenState extends State<Question3Screen> {
         ];
       }
 
-      setState(() {
-        loading = false;
-      });
+      setState(() => loading = false);
     } catch (e) {
       debugPrint("❌ Error loading images: $e");
+      // Handle error state appropriately
+      setState(() => loading = false);
     }
   }
 
@@ -145,17 +152,16 @@ class _Question3ScreenState extends State<Question3Screen> {
       );
     }
 
-    final questionText = widget.isMale
+    final String questionText = widget.isMale
         ? "This is Question 3: Select from 7 boxes"
         : "This is Question 3: Select from 5 boxes";
 
     return QuestionScreen(
       columnIndex: 2,
-      boxImages: images, // ✅ Local cached paths used here
+      boxImages: images,
       boxTips: tips,
       boxText: texts,
       questionText: questionText,
-      isMale: widget.isMale,
       onNext: () {
         Navigator.push(
           context,
@@ -165,6 +171,7 @@ class _Question3ScreenState extends State<Question3Screen> {
         );
       },
       onPrevious: () => Navigator.pop(context),
+      isMale: widget.isMale,
     );
   }
 }

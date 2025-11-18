@@ -25,7 +25,7 @@ dependencies:
   path_provider: ^2.1.5
   share_plus: ^10.0.0
   firebase_storage: ^11.7.7
-  supabase_flutter: ^2.10.0
+  supabase_flutter: ^2.10.3
   flutter_dotenv: ^6.0.0
   flutter_secure_storage: ^9.2.4
   jwt_decoder: ^2.0.1
