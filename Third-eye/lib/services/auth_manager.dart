@@ -73,7 +73,7 @@ class AuthManager {
     );
 
     final result = await _signUpRepo.registerUser(user);
-    if (result != null && result["tokens"] != null) {
+    if (result["tokens"] != null) {
       _startAutoRefresh(result["tokens"]["access_token"]);
     }
     return result;

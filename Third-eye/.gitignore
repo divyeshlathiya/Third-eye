@@ -82,3 +82,5 @@ Icon?
 !ios/**/default.mode2v3
 !ios/**/default.perspectivev3
 
+/android/key.properties
+/android/app/*.jks

@@ -12,7 +12,7 @@ import 'notification/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env"); // load .env file
+  await dotenv.load(fileName: ".env");
 
   // Initialize Firebase only if not already initialized
   try {
@@ -20,7 +20,6 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      debugPrint("Firebase initialized.");
     } else {
       Firebase.app();
       debugPrint("Firebase was already initialized.");

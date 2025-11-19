@@ -38,27 +38,27 @@ class _Question2ScreenState extends State<Question2Screen> {
       // 🔹 Define Firebase Storage references
       List<String> refs = widget.isMale
           ? [
-        'male/q2-20.png',
-        'male/agna.png',
-        'male/q2-10.png',
-        'male/agna.png',
-        'male/q2-0.png',
-        'male/agna.png',
-        'male/q2-neg10.png',
-        'male/agna.png',
-        'male/q2-neg20.png',
-      ]
+              'male/q2-20.png',
+              'male/agna.png',
+              'male/q2-10.png',
+              'male/agna.png',
+              'male/q2-0.png',
+              'male/agna.png',
+              'male/q2-neg10.png',
+              'male/agna.png',
+              'male/q2-neg20.png',
+            ]
           : [
-        'female/fq2-30.png',
-        'female/fq2-20.png',
-        'female/fq2-10.png',
-        'female/agna.png',
-        'female/fq2-0.png',
-        'female/agna.png',
-        'female/fq2-neg10.png',
-        'female/fq2-neg20.png',
-        'female/fq2-neg30.png',
-      ];
+              'female/fq2-30.png',
+              'female/fq2-20.png',
+              'female/fq2-10.png',
+              'female/agna.png',
+              'female/fq2-0.png',
+              'female/agna.png',
+              'female/fq2-neg10.png',
+              'female/fq2-neg20.png',
+              'female/fq2-neg30.png',
+            ];
 
       // 🔹 Download or use cached image files
       for (String refPath in refs) {
@@ -71,13 +71,15 @@ class _Question2ScreenState extends State<Question2Screen> {
         } else {
           // ⬇️ Download and save to local storage
           try {
-            final url = await FirebaseStorage.instance.ref(refPath).getDownloadURL();
+            final url =
+                await FirebaseStorage.instance.ref(refPath).getDownloadURL();
             await dio.download(url, localFile.path);
             localPaths.add(localFile.path);
           } catch (e) {
             debugPrint("❌ Error downloading $refPath: $e");
             // Add a placeholder or handle missing images
-            localPaths.add(localFile.path); // Will use the path even if download failed
+            localPaths.add(
+                localFile.path); // Will use the path even if download failed
           }
         }
       }
@@ -88,7 +90,6 @@ class _Question2ScreenState extends State<Question2Screen> {
       // 🔹 Define text + tips
       if (widget.isMale) {
         tips = [
-          "Tip for Box 0",
           "Today you're doing great job by identifying what my family want and fullfilled it. Keep it up.",
           "Tip for Box 2",
           "Today you have done great job on providing the family what needed. But identify what they realy want. When u full fill it it will be more joy in family.",
@@ -110,7 +111,6 @@ class _Question2ScreenState extends State<Question2Screen> {
           "Feeling sad due to lack of appreciation",
           "Male Box 6 text here...",
           "Feeling trapped, angry, or violent",
-          "Male Box 8 text here...",
         ];
       } else {
         tips = [
@@ -150,27 +150,28 @@ class _Question2ScreenState extends State<Question2Screen> {
   Widget build(BuildContext context) {
     if (loading) {
       return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/rocket.gif',
-                width: 180,
-                height: 180,
-              ),
-              const SizedBox(height: 16), // Add some spacing
-              const Text("Question is loading...",style: TextStyle(fontWeight: FontWeight.bold),)
-            ],
-          ),
-        )
-      );
+          body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/rocket.gif',
+              width: 180,
+              height: 180,
+            ),
+            const SizedBox(height: 16), // Add some spacing
+            const Text(
+              "Question is loading...",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )
+          ],
+        ),
+      ));
     }
 
-    final String questionText = widget.isMale
-        ? "Select from 5 boxes"
-        : "Select from 7 boxes";
+    final String questionText =
+        widget.isMale ? "Select from 5 boxes" : "Select from 7 boxes";
 
     return QuestionScreen(
       columnIndex: 1,
