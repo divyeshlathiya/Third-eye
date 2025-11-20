@@ -10,6 +10,7 @@ import 'package:thirdeye/signupform.dart';
 import 'package:thirdeye/services/auth_manager.dart';
 import 'package:thirdeye/utils/storage_helper.dart';
 import 'package:thirdeye/config/app_theme.dart';
+import 'package:thirdeye/notification/permission_requester.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -70,10 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        // );
+        await PermissionRequester.askThenNavigateReplacement(
+            context, const DashboardScreen());
         CustomSnackBar.showCustomSnackBar(
           context,
           "Welcome $firstName",
