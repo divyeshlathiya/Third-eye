@@ -78,83 +78,98 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
         ),
       ),
-      body: LoadingOverlay(
-        isLoading: isLoading,
-        loadingText: "Sending OTP...",
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingL),
-          child: Form(
-            key: _formKey, // Add Form widget
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppTheme.spacingXL),
-                FadeInDown(
-                  duration: AppTheme.animationSlow,
-                  child: Text(
-                    "Reset Password",
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingM),
-                FadeInDown(
-                  duration: AppTheme.animationSlow,
-                  delay: const Duration(milliseconds: 200),
-                  child: Text(
-                    "Enter your email address and we'll send you a code to reset your password.",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingXXL),
-                FadeInUp(
-                  duration: AppTheme.animationMedium,
-                  delay: const Duration(milliseconds: 400),
-                  child: EmailInputField(
-                    controller: _emailController,
-                    hint: "johndoe@gmail.com",
-                    onChanged: (value) {
-                      print('Email: $value');
-                      _updateValidationState(); // Add real-time validation
-                    },
-                    validator: Validator.validateEmail, // Add email validator
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingS),
-                // Optional: Add email format hint
-                FadeInUp(
-                  duration: AppTheme.animationMedium,
-                  delay: const Duration(milliseconds: 500),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: AppTheme.spacingS),
-                    child: Text(
-                      "We'll send a verification code to this email",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textTertiary,
-                            fontStyle: FontStyle.italic,
-                          ),
+      // Use a Stack so we can overlay a centered loader
+      body: Stack(
+        children: [
+          // ---- Main UI ----
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingL),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: AppTheme.spacingXL),
+                    FadeInDown(
+                      duration: AppTheme.animationSlow,
+                      child: Text(
+                        "Reset Password",
+                        style:
+                            Theme.of(context).textTheme.displayMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
+                                ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: AppTheme.spacingM),
+                    FadeInDown(
+                      duration: AppTheme.animationSlow,
+                      delay: Duration(milliseconds: 200),
+                      child: Text(
+                        "Enter your email address and we'll send you a code to reset your password.",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.spacingXXL),
+                    FadeInUp(
+                      duration: AppTheme.animationMedium,
+                      delay: Duration(milliseconds: 400),
+                      child: EmailInputField(
+                        controller: _emailController,
+                        hint: "johndoe@gmail.com",
+                        onChanged: (value) {
+                          _updateValidationState();
+                        },
+                        validator: Validator.validateEmail,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.spacingS),
+                    FadeInUp(
+                      duration: AppTheme.animationMedium,
+                      delay: Duration(milliseconds: 500),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: AppTheme.spacingS),
+                        child: Text(
+                          "We'll send a verification code to this email",
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppTheme.textTertiary,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.spacingXL),
+                    FadeInUp(
+                      duration: AppTheme.animationMedium,
+                      delay: Duration(milliseconds: 600),
+                      child: PrimaryButton(
+                        text: isLoading ? "Sending..." : "Send OTP",
+                        icon: isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(Icons.email, color: Colors.white),
+                        onPressed: isLoading
+                            ? null
+                            : _sendOtp, // disable button while loading
+                        isFullWidth: true,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppTheme.spacingXL),
-                FadeInUp(
-                  duration: AppTheme.animationMedium,
-                  delay: const Duration(milliseconds: 600),
-                  child: PrimaryButton(
-                    text: "Send OTP",
-                    icon: const Icon(Icons.email, color: Colors.white),
-                    onPressed: _sendOtp,
-                    isFullWidth: true,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

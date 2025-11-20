@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thirdeye — Account & Data Deletion Request</title>
+  <style>
+    :root{--bg:#0f1724;--card:#fff;--accent:#0b66ff;--muted:#666}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, "Helvetica Neue", Arial; margin:0; background:var(--bg); color:#111}
+    .container{max-width:920px;margin:48px auto;padding:24px;background:linear-gradient(180deg,#071025 0%, #081427 60%);color:var(--text);color:var(--text)}
+    .card{background:var(--card);padding:28px;border-radius:12px;box-shadow:0 6px 24px rgba(18,20,30,0.06)}
+    header{display:flex;gap:16px;align-items:center}
+    header img{width:72px;height:72px;object-fit:contain;border-radius:12px}
+    h1{margin:0;font-size:22px}
+    p.lead{color:var(--muted);margin:8px 0 18px}
+    form{margin-top:8px;display:grid;gap:12px}
+    label{font-size:13px;color:#222}
+    input[type="text"], input[type="email"], textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px}
+    textarea{min-height:120px;resize:vertical}
+    .muted{color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(11,102,255,0.12)}
+    footer{margin-top:18px;font-size:13px;color:var(--muted)}
+    @media (max-width:600px){.container{margin:20px;padding:16px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>
+        <!-- NOTE: image path references the uploaded file in the container. Your hosting system will need to transform this local path into a public URL. -->
+        <img src="./logo.png" alt="Thirdeye logo">
+        <div>
+          <h1>Thirdeye — Account & Data Deletion Request</h1>
+          <p class="lead">Use this page to request permanent deletion of your account and associated data from the Thirdeye – Emotion Tracker app.</p>
+        </div>
+      </header>
+
+      <section>
+        <p class="muted">To delete your account, please complete the form below. Submitting will open your email client with a pre-filled message to our support team at <strong>developer.thirdeyeemotion@gmail.com</strong>. If you prefer, you may send an email directly to that address.</p>
+
+        <form id="deleteForm" onsubmit="handleSubmit(event)">
+          <div>
+            <label for="fullname">Full name</label>
+            <input id="fullname" name="fullname" type="text" placeholder="Your full name" required>
+          </div>
+
+          <div>
+            <label for="email">Registered email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+          </div>
+
+          <div>
+            <label for="reason">Reason for deletion (optional)</label>
+            <textarea id="reason" name="reason" placeholder="If you want, briefly tell us why you're deleting"></textarea>
+          </div>
+
+          <div>
+            <label><input id="confirm" type="checkbox" required> I confirm that I want my Thirdeye account and all associated data to be permanently deleted.</label>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn">Request account deletion</button>
+            <button type="button" class="btn ghost" onclick="mailtoDirect()">Open email client manually</button>
+          </div>
+        </form>
+
+        <footer>
+          <p class="muted"><strong>Processing time:</strong> Once we receive your request we will verify ownership and delete your data within 48–72 hours. We may contact the registered email if additional verification is needed.</p>
+          <p class="muted">If you do not receive confirmation after 72 hours, email us at <strong>developer.thirdeyeemotion@gmail.com</strong>.</p>
+        </footer>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function escapeForMail(text){
+      return encodeURIComponent(text || '');
+    }
+
+    function handleSubmit(e){
+      e.preventDefault();
+      const name = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+      const subject = 'Account Deletion Request — Thirdeye';
+      const body = `Please delete my Thirdeye account and all associated data.\n\nFull name: ${name}\nRegistered email: ${email}\n\nReason (optional):\n${reason}\n\nI confirm I want my account permanently deleted.`;
+
+      const mailto = `mailto:developer.thirdeyeemotion@gmail.com?subject=${escapeForMail(subject)}&body=${escapeForMail(body)}`;
+      // Open user's mail client
+      window.location.href = mailto;
+    }
+
+    function mailtoDirect(){
+      const subject = encodeURIComponent('Account Deletion Request — Thirdeye');
+      const body = encodeURIComponent('Please delete my Thirdeye account and all associated data.\n\n(Please include your registered email address and any details)');
+      window.location.href = `mailto:developer.thirdeyeemotion@gmail.com?subject=${subject}&body=${body}`;
+    }
+  </script>
+</body>
+</html>
